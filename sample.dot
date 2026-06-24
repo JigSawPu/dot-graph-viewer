@@ -1,6 +1,9 @@
-digraph G {
-  rankdir=LR;
-  node [shape=box, style="rounded,filled", fillcolor="#eef2ff", color="#6366f1"];
-  iPhone -> GitHub -> Render -> DotGlass;
-  DotGlass -> "Interactive SVG";
+digraph Project {
+  idea [label="Central idea", shape=ellipse, fillcolor="#7b88ff"];
+  research [label="Research"];
+  design [label="Design"];
+  build [label="Build"];
+  idea -> research;
+  idea -> design;
+  idea -> build;
 }
