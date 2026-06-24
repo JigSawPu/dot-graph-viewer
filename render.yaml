@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: dotcanvas-future
+    name: dotcanvas-studio
     runtime: static
     staticPublishPath: .
     headers:
@@ -10,3 +10,6 @@ services:
       - path: /manifest.webmanifest
         name: Content-Type
         value: application/manifest+json
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache

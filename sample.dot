@@ -1,8 +1,13 @@
-digraph FutureMap {
-  core [label="Future graph studio", shape=ellipse, fillcolor="#173452", color="#38a8ff"];
-  visual [label="Luminous edges"];
-  canvas [label="Infinite canvas"];
-  edit [label="Touch editing"];
-  layouts [label="10 diagram structures"];
-  core -> visual; core -> canvas; core -> edit; core -> layouts;
+digraph Project {
+  graph [rankdir=LR, splines=curved];
+  node [shape=box, style=filled, fillcolor="#fffefa", color="#9b82f6", fontcolor="#292a31"];
+  idea [label="Central idea"];
+  research [label="Research", color="#9b82f6"];
+  design [label="Design", color="#ef8fba"];
+  build [label="Build", color="#f3a85e"];
+  launch [label="Launch", color="#63cbb7"];
+  idea -> research;
+  idea -> design;
+  idea -> build;
+  idea -> launch;
 }

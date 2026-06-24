@@ -1,14 +1,14 @@
 {
   "id": "./",
-  "name": "DotCanvas Future",
+  "name": "DotCanvas Studio",
   "short_name": "DotCanvas",
-  "description": "A futuristic touch-first DOT graph, mind-map and diagram editor.",
+  "description": "A touch-first DOT graph, mind-map, and diagram studio.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
-  "background_color": "#06101d",
-  "theme_color": "#06101d",
+  "background_color": "#f7f5f1",
+  "theme_color": "#f7f5f1",
   "orientation": "any",
   "categories": ["productivity", "utilities", "graphics-design"],
   "icons": [

@@ -1,49 +1,54 @@
-# DotCanvas Future PWA
+# DotCanvas Studio v7
 
-A touch-first DOT graph and diagram editor packaged as an installable Progressive Web App. It runs as a Render Static Site and requires no backend.
+A mobile-first Progressive Web App for opening DOT files and editing graphs, mind maps, and structured diagrams directly in the browser.
 
-## Deploy
+## What this version adds
 
-Upload every file and folder in this directory to the root of a GitHub repository. In Render, create a Static Site with an empty build command and `.` as the publish directory. The included `render.yaml` can also be used as a Blueprint.
+- A light, paper-like mind-map interface inspired by modern native mobile diagram apps
+- Smooth pastel branch colors and rounded content cards
+- Focus mode for isolating a selected topic and its descendants
+- Status tags displayed beside nodes
+- Custom tags with editable names and colors
+- Node icon picker
+- Node notes and subtitles
+- Node image attachments stored inside JSON project backups
+- A floating style panel with palettes, node colors, branch colors, connection styles, and line width
+- Search across titles, subtitles, notes, icons, and tags
+- A compact floating bottom toolbar
+- Project sharing through the iOS share sheet when supported
+- DOT, JSON, PNG, and JPG export
+- Ten structure families: mind map, flowchart, fishbone, timeline, matrix, Gantt, organization chart, tree, concept map, and bubble map
+- Local autosave, undo/redo, light/dark themes, and PWA installation
 
-## Install on iPhone
+## Static site or web service?
 
-1. Open the deployed URL in Safari.
-2. Tap Share.
-3. Choose **Add to Home Screen**.
-4. Launch DotCanvas from its Home Screen icon.
+This package remains a Render **Static Site**. All current editing features run on the device and do not require a server.
 
-The app launches in standalone mode and caches its shell for offline use. Cytoscape is cached from jsDelivr during the first online installation, so open the app online once before relying on offline mode.
+A backend would only be required for features such as:
 
-## Updating
+- user accounts
+- cloud synchronization between devices
+- shared editable links
+- live multi-user collaboration
+- server-managed version history
+- team workspaces and permissions
 
-Push changes to GitHub and let Render redeploy. Change `CACHE_VERSION` in `service-worker.js` whenever cached files change. Installed clients will show an update prompt when the new service worker is ready.
+The UI includes a Share action, but in this static build it shares or downloads an editable JSON project file. It is not real-time collaboration.
+
+## Deploy to Render
+
+1. Upload every file in this folder to the root of the GitHub repository.
+2. In Render, create or keep a **Static Site**.
+3. Leave the build command empty.
+4. Set the publish directory to `.`.
+5. Deploy the `main` branch.
+
+After deployment, remove the older Home Screen installation once, open the new Render URL in Safari, verify version 7, then use **Share → Add to Home Screen**.
+
+## Important offline note
+
+Cytoscape.js is cached after the app has been opened online. Open the deployed app online at least once before relying on offline mode.
 
 ## Local data
 
-Projects are autosaved in browser localStorage. Export DOT or JSON backups regularly because deleting the PWA or clearing Safari website data can remove local projects.
-
-
-## Mobile layout update
-
-This build fixes duplicated iPhone safe-area spacing, aligns the header and canvas, makes the workspace use `100dvh`, compacts the left toolbar, anchors the HUD, and keeps small graphs at a readable minimum zoom.
-
-
-## Click-fix release
-
-This build fixes a JavaScript syntax error in the structure reflow function that prevented the application script from loading, which made every UI button appear unresponsive. The service-worker cache version has also been increased so installed copies receive the corrected script.
-
-
-## Theme option
-
-Use the sun/moon button in the top toolbar to switch between dark and light themes. The selected theme is saved on the device and restored the next time the app opens.
-
-
-## v5 stability fixes
-- Node button now creates a node immediately in the center of the visible canvas.
-- Structure cards use delegated touch-safe handlers and reliably apply layouts.
-- The app shell is pinned to the complete iPhone viewport, extending the canvas behind the bottom controls.
-
-## v6 Safari repair
-
-This build fixes a JavaScript temporal-dead-zone startup error caused by accessing the Cytoscape variable before initialization. It also versions the CSS/JS asset URLs to bypass older service-worker cache entries and uses `visualViewport` to keep the canvas aligned with the actual standalone iPhone screen height.
+Projects are stored in browser local storage. Image attachments can use substantial storage, so export JSON backups regularly. Clearing Safari website data or deleting the installed web app may remove local projects.
