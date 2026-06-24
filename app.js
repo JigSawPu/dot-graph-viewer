@@ -18,7 +18,7 @@ const EXAMPLE = `digraph DotGlass {
   Privacy [shape=note, label="Private by design", fillcolor="#2B2440"];
 }`;
 
-let viz, currentSvg = null, currentName = 'example.dot';
+let viz, currentSvg = null, currentName = 'No file open';
 let transform = { x: 0, y: 0, scale: 1 };
 let drag = null, pinchDistance = null, toastTimer;
 
@@ -74,8 +74,8 @@ function downloadSvg(){
 
 $('#openBtn').onclick=()=>fileInput.click(); $('#dropZone').onclick=(e)=>{if(e.target.id!=='openBtn')fileInput.click()};
 fileInput.onchange=()=>readFile(fileInput.files[0]); $('#renderBtn').onclick=renderGraph;
-$('#exampleBtn').onclick=()=>{editor.value=EXAMPLE;currentName='example.dot';renderGraph()};
-$('#clearBtn').onclick=()=>{editor.value='';graphStage.replaceChildren();currentSvg=null;emptyState.hidden=false;graphStats.textContent='Ready';localStorage.removeItem('dotglass-source')};
+$('#exampleBtn').onclick=()=>{editor.value=EXAMPLE;currentName='example.dot';fileName.textContent=currentName;renderGraph()};
+$('#clearBtn').onclick=()=>{editor.value='';graphStage.replaceChildren();currentSvg=null;currentName='No file open';fileName.textContent=currentName;emptyState.hidden=false;graphStats.textContent='Ready';statusDot.classList.remove('error');setLoading(false);localStorage.removeItem('dotglass-source')};
 $('#fitBtn').onclick=fitGraph; $('#zoomInBtn').onclick=()=>zoomAt(1.25); $('#zoomOutBtn').onclick=()=>zoomAt(.8); $('#downloadBtn').onclick=downloadSvg;
 $('#fullscreenBtn').onclick=()=>document.fullscreenElement?document.exitFullscreen():$('#viewer').requestFullscreen?.();
 $('#themeBtn').onclick=()=>{document.documentElement.classList.toggle('light');localStorage.setItem('dotglass-theme',document.documentElement.classList.contains('light')?'light':'dark')};
@@ -92,4 +92,16 @@ canvas.addEventListener('touchmove',e=>{if(e.touches.length===2&&pinchDistance){
 canvas.addEventListener('touchend',()=>pinchDistance=null); window.addEventListener('resize',()=>currentSvg&&fitGraph());
 
 if(localStorage.getItem('dotglass-theme')==='light')document.documentElement.classList.add('light');
-editor.value=localStorage.getItem('dotglass-source')||EXAMPLE; renderGraph();
+const savedSource=localStorage.getItem('dotglass-source');
+if(savedSource){
+  editor.value=savedSource;
+  currentName='Restored draft';
+  fileName.textContent=currentName;
+  renderGraph();
+}else{
+  editor.value='';
+  fileName.textContent=currentName;
+  graphStats.textContent='Ready';
+  emptyState.hidden=false;
+  setLoading(false);
+}
