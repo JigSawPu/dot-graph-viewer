@@ -32,3 +32,8 @@ This build fixes duplicated iPhone safe-area spacing, aligns the header and canv
 ## Click-fix release
 
 This build fixes a JavaScript syntax error in the structure reflow function that prevented the application script from loading, which made every UI button appear unresponsive. The service-worker cache version has also been increased so installed copies receive the corrected script.
+
+
+## Theme option
+
+Use the sun/moon button in the top toolbar to switch between dark and light themes. The selected theme is saved on the device and restored the next time the app opens.

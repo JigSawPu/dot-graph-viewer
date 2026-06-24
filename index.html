@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
-  <meta name="theme-color" content="#06101d" />
+  <meta id="themeColorMeta" name="theme-color" content="#06101d" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="DotCanvas" />
@@ -22,6 +22,7 @@
       <input id="fileInput" type="file" accept=".dot,.gv,.json,text/plain,text/vnd.graphviz,application/json" hidden />
       <button id="exampleBtn" class="button compact action-button" aria-label="Load example"><span class="action-icon">◫</span><span class="action-text">Example</span></button>
       <button id="structuresBtn" class="button compact accent action-button" aria-label="Choose structure"><span class="action-icon">▦</span><span class="action-text">Structures</span></button>
+      <button id="themeBtn" class="button compact action-button" aria-label="Switch to light theme" title="Switch theme"><span id="themeIcon" class="action-icon">☼</span><span class="action-text">Theme</span></button>
       <button id="exportBtn" class="button compact primary action-button" aria-label="Export"><span class="action-icon">↧</span><span class="action-text">Export</span></button>
     </div>
   </header>

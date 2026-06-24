@@ -1,4 +1,37 @@
 const $=s=>document.querySelector(s);const uid=()=>`n_${Math.random().toString(36).slice(2,9)}`;
+
+const THEME_KEY='dotcanvas-theme';
+function currentTheme(){return document.documentElement.dataset.theme||'dark'}
+function applyTheme(theme,{announce=false}={}){
+  const next=theme==='light'?'light':'dark';
+  document.documentElement.dataset.theme=next;
+  localStorage.setItem(THEME_KEY,next);
+  const light=next==='light';
+  const meta=document.querySelector('#themeColorMeta');
+  if(meta)meta.content=light?'#edf4fb':'#06101d';
+  const btn=document.querySelector('#themeBtn');
+  const icon=document.querySelector('#themeIcon');
+  if(btn){btn.setAttribute('aria-label',light?'Switch to dark theme':'Switch to light theme');btn.title=light?'Dark theme':'Light theme'}
+  if(icon)icon.textContent=light?'☾':'☼';
+  if(typeof cy!=='undefined'){
+    cy.style()
+      .selector('node:selected').style({
+        'border-color':light?'#1677e8':'#63d8ff',
+        'shadow-color':light?'#1677e8':'#2d8cff',
+        'background-color':light?'#e4f1fc':'#19314b'
+      })
+      .selector('edge').style({
+        'line-color':light?'#2582cf':'#2d8cff',
+        'target-arrow-color':light?'#147fc7':'#62ceff',
+        'line-gradient-stop-colors':light?'#5ea8df #1677e8':'#164c91 #43c8ff',
+        'underlay-color':light?'#5d9fd4':'#1579d8'
+      })
+      .update();
+  }
+  if(announce&&typeof toast==='function')toast(light?'Light theme enabled':'Dark theme enabled');
+}
+applyTheme(localStorage.getItem(THEME_KEY)||'dark');
+
 const STRUCTURES={
  mindmap:{name:'Traditional Mind Map',short:'Mind map',desc:'Central idea with balanced branches.',icon:'mind',template:'mindmap'},
  flowchart:{name:'Logic Chart & Flowchart',short:'Flowchart',desc:'Process steps, decisions and outcomes.',icon:'flow',template:'flowchart'},
@@ -12,7 +45,7 @@ const STRUCTURES={
  bubble:{name:'Bubble Map',short:'Bubble map',desc:'Central topic surrounded by associations.',icon:'bubble',template:'bubble'}
 };
 const state={tool:'select',connectFrom:null,history:[],future:[],restoring:false,structure:'mindmap'};
-const defaults=(label='New node')=>({id:uid(),label,subtitle:'',shape:'roundrectangle',size:150,fill:'#14263a',textColor:'#eef7ff',border:'#2d8cff',locked:false});
+const defaults=(label='New node')=>{const light=currentTheme()==='light';return {id:uid(),label,subtitle:'',shape:'roundrectangle',size:150,fill:light?'#ffffff':'#14263a',textColor:light?'#183047':'#eef7ff',border:light?'#2385d7':'#2d8cff',locked:false}};
 const cy=cytoscape({container:$('#cy'),elements:[],minZoom:.2,maxZoom:4,wheelSensitivity:.18,boxSelectionEnabled:true,selectionType:'additive',style:[
  {selector:'node',style:{'shape':'data(shape)','width':'data(size)','height':58,'background-color':'data(fill)','border-width':1.5,'border-color':'data(border)','border-opacity':.8,'label':'data(displayLabel)','color':'data(textColor)','font-size':13,'font-weight':600,'text-wrap':'wrap','text-max-width':'130px','text-valign':'center','text-halign':'center','padding':'10px','shadow-blur':20,'shadow-color':'data(border)','shadow-opacity':.18,'shadow-offset-x':0,'shadow-offset-y':0,'overlay-opacity':0}},
  {selector:'node:selected',style:{'border-width':2.5,'border-color':'#63d8ff','shadow-blur':34,'shadow-color':'#2d8cff','shadow-opacity':.52,'background-color':'#19314b'}},
@@ -21,6 +54,8 @@ const cy=cytoscape({container:$('#cy'),elements:[],minZoom:.2,maxZoom:4,wheelSen
  {selector:'edge:selected',style:{'width':2.4,'opacity':1,'line-color':'#79e4ff','underlay-opacity':.35,'underlay-padding':5}},
  {selector:'.undirected',style:{'target-arrow-shape':'none'}},{selector:'.muted',style:{'opacity':.35}}
 ],layout:{name:'preset'}});
+applyTheme(currentTheme());
+$('#themeBtn').onclick=()=>applyTheme(currentTheme()==='light'?'dark':'light',{announce:true});
 function refreshLabels(){cy.nodes().forEach(n=>n.data('displayLabel',n.data('subtitle')?`${n.data('label')}\n${n.data('subtitle')}`:n.data('label')))}
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('show'),1800)}
 function project(){return JSON.stringify({elements:cy.json().elements,pan:cy.pan(),zoom:cy.zoom(),structure:state.structure})}
@@ -120,7 +155,7 @@ function parseDot(dot){const clean=dot.replace(/\/\*[\s\S]*?\*\//g,'').replace(/
 function importText(text,name='Imported graph'){try{if(text.trim().startsWith('{'))restore(JSON.parse(text));else{const els=parseDot(text);if(!els.some(e=>e.group==='nodes'))throw new Error('No nodes found');cy.elements().remove();cy.add(els);refreshLabels();runStructure('mindmap')}snapshot();toast(`${name} opened`)}catch(e){console.error(e);toast('Could not parse this file')}}
 $('#fileInput').onchange=async e=>{const f=e.target.files[0];if(!f)return;importText(await f.text(),f.name);e.target.value=''};['dragenter','dragover'].forEach(type=>$('#canvasWrap').addEventListener(type,e=>{e.preventDefault();$('#canvasWrap').classList.add('dragging')}));['dragleave','drop'].forEach(type=>$('#canvasWrap').addEventListener(type,e=>{e.preventDefault();$('#canvasWrap').classList.remove('dragging')}));$('#canvasWrap').addEventListener('drop',async e=>{const f=e.dataTransfer.files[0];if(f)importText(await f.text(),f.name)});$('#exampleBtn').onclick=()=>{cy.elements().remove();cy.add(template('concept'));refreshLabels();runStructure('concept')};
 const esc=s=>String(s??'').replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\n/g,'\\n');function toDot(){const lines=['digraph DotCanvas {','  graph [overlap=false, splines=curved];','  node [style=filled];'];cy.nodes().forEach(n=>{const d=n.data(),p=n.position(),shape={roundrectangle:'box',rectangle:'box',ellipse:'ellipse',diamond:'diamond',hexagon:'hexagon'}[d.shape]||'box';lines.push(`  "${esc(n.id())}" [label="${esc(d.label)}", shape=${shape}, fillcolor="${d.fill}", color="${d.border}", fontcolor="${d.textColor}", pos="${p.x.toFixed(1)},${(-p.y).toFixed(1)}!"];`)});cy.edges().forEach(e=>lines.push(`  "${esc(e.source().id())}" -> "${esc(e.target().id())}";`));lines.push('}');return lines.join('\n')}
-function download(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}$('#exportBtn').onclick=()=>$('#exportDialog').showModal();document.querySelectorAll('[data-export]').forEach(b=>b.onclick=()=>{const type=b.dataset.export;if(type==='dot')download(new Blob([toDot()],{type:'text/vnd.graphviz'}),'dotcanvas-future.dot');if(type==='json')download(new Blob([project()],{type:'application/json'}),'dotcanvas-future.json');if(type==='png'||type==='jpg'){const uri=type==='png'?cy.png({full:true,scale:2,bg:'transparent'}):cy.jpg({full:true,scale:2,bg:'#040c17'});const a=document.createElement('a');a.href=uri;a.download=`dotcanvas-future.${type}`;a.click()}$('#exportDialog').close()});document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?$('#redoBtn').click():$('#undoBtn').click()}if((e.key==='Delete'||e.key==='Backspace')&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName))$('#deleteBtn').click()});
+function download(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}$('#exportBtn').onclick=()=>$('#exportDialog').showModal();document.querySelectorAll('[data-export]').forEach(b=>b.onclick=()=>{const type=b.dataset.export;if(type==='dot')download(new Blob([toDot()],{type:'text/vnd.graphviz'}),'dotcanvas-future.dot');if(type==='json')download(new Blob([project()],{type:'application/json'}),'dotcanvas-future.json');if(type==='png'||type==='jpg'){const uri=type==='png'?cy.png({full:true,scale:2,bg:'transparent'}):cy.jpg({full:true,scale:2,bg:currentTheme()==='light'?'#f5f9fd':'#040c17'});const a=document.createElement('a');a.href=uri;a.download=`dotcanvas-future.${type}`;a.click()}$('#exportDialog').close()});document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?$('#redoBtn').click():$('#undoBtn').click()}if((e.key==='Delete'||e.key==='Backspace')&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName))$('#deleteBtn').click()});
 const saved=localStorage.getItem('dotcanvas-future-project');if(saved){restore(saved);state.history=[saved]}else{snapshot()}setStructureUI();updateEmpty();
 
 

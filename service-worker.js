@@ -1,4 +1,4 @@
-const CACHE_VERSION = "dotcanvas-ui-v3";
+const CACHE_VERSION = "dotcanvas-ui-v4-light-theme";
 const APP_SHELL = [
   "./", "./index.html", "./styles.css", "./app.js", "./manifest.webmanifest",
   "./offline.html", "./sample.dot", "./icons/icon-192.png", "./icons/icon-512.png",
