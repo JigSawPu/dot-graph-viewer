@@ -29,3 +29,126 @@ body {
   input, textarea { user-select: text; -webkit-user-select: text; }
   .topbar { padding-top: max(8px, env(safe-area-inset-top)); }
 }
+
+/* Mobile alignment pass — v2 */
+html, body {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  padding: 0 !important;
+  overflow: hidden;
+}
+body { position: fixed; inset: 0; }
+.app-shell {
+  width: 100%;
+  height: 100dvh;
+  min-height: 100dvh;
+  padding:
+    max(8px, env(safe-area-inset-top))
+    max(8px, env(safe-area-inset-right))
+    max(8px, env(safe-area-inset-bottom))
+    max(8px, env(safe-area-inset-left));
+  display: grid;
+  grid-template-rows: 60px minmax(0, 1fr);
+  gap: 8px;
+}
+.topbar {
+  width: 100%;
+  height: 60px;
+  min-height: 60px;
+  margin: 0;
+  padding: 8px 10px !important;
+  border-radius: 20px;
+}
+.workspace {
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  position: relative;
+}
+.canvas-wrap { inset: 0; border-radius: 24px; }
+
+@media (max-width: 760px) {
+  .app-shell {
+    grid-template-rows: 56px minmax(0, 1fr);
+    gap: 7px;
+  }
+  .topbar {
+    height: 56px;
+    min-height: 56px;
+    padding: 7px 8px !important;
+    gap: 8px;
+  }
+  .brand { min-width: 0; gap: 8px; }
+  .brand-mark { width: 38px; height: 38px; flex: 0 0 38px; border-radius: 13px; }
+  .brand b { font-size: clamp(15px, 4.5vw, 19px); white-space: nowrap; }
+  .top-actions { margin-left: auto; gap: 5px; min-width: 0; }
+  .button.compact { min-height: 40px; padding: 7px 10px; font-size: 12px; border-radius: 13px; }
+  .top-actions #exampleBtn { display: none; }
+
+  .toolbar {
+    left: 8px;
+    top: 8px;
+    bottom: 8px;
+    width: 58px;
+    padding: 6px 5px;
+    border-radius: 20px;
+    gap: 2px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+  .toolbar::-webkit-scrollbar { display: none; }
+  .tool { min-height: 48px; flex: 0 0 48px; border-radius: 14px; }
+  .tool span { font-size: 20px; line-height: 1; }
+  .tool small { font-size: 9px; line-height: 1.1; }
+  .tool-separator { flex: 0 0 1px; margin: 3px 5px; }
+
+  .canvas-hud {
+    left: 74px;
+    right: 8px;
+    bottom: 8px;
+    height: 42px;
+    padding: 0 14px;
+    border-radius: 16px;
+  }
+  .canvas-hud span:nth-child(2) { display: none; }
+  .empty-state {
+    left: calc(50% + 29px);
+    width: min(430px, calc(100% - 92px));
+  }
+  .inspector {
+    top: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: min(340px, calc(100vw - 82px));
+  }
+  .toast { bottom: calc(env(safe-area-inset-bottom) + 16px); }
+}
+
+@media (max-width: 430px) {
+  .topbar { padding-inline: 7px !important; }
+  .brand-mark { width: 36px; height: 36px; flex-basis: 36px; }
+  .brand b { font-size: 16px; }
+  .top-actions { gap: 4px; }
+  .button.compact { padding-inline: 9px; font-size: 11.5px; }
+  #structuresBtn { max-width: 92px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+
+@media (max-width: 365px) {
+  .brand b { font-size: 14px; }
+  .brand-mark { width: 34px; height: 34px; flex-basis: 34px; }
+  .button.compact { padding-inline: 8px; }
+  #structuresBtn { width: 42px; font-size: 0; }
+  #structuresBtn::after { content: "⌘"; font-size: 18px; }
+  #exportBtn { width: 42px; font-size: 0; }
+  #exportBtn::after { content: "⇧"; font-size: 18px; }
+}
+
+@media (display-mode: standalone) {
+  .app-shell {
+    padding-top: max(8px, env(safe-area-inset-top));
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+}

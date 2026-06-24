@@ -22,3 +22,8 @@ Push changes to GitHub and let Render redeploy. Change `CACHE_VERSION` in `servi
 ## Local data
 
 Projects are autosaved in browser localStorage. Export DOT or JSON backups regularly because deleting the PWA or clearing Safari website data can remove local projects.
+
+
+## Mobile layout update
+
+This build fixes duplicated iPhone safe-area spacing, aligns the header and canvas, makes the workspace use `100dvh`, compacts the left toolbar, anchors the HUD, and keeps small graphs at a readable minimum zoom.
