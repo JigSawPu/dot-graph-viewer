@@ -18,27 +18,27 @@
   <header class="topbar glass">
     <div class="brand"><span class="brand-mark">◈</span><div><b>DotCanvas</b><small>FUTURE GRAPH STUDIO</small></div></div>
     <div class="top-actions">
-      <label class="button compact" for="fileInput">Open</label>
+      <label class="button compact action-button" for="fileInput" aria-label="Open file"><span class="action-icon">↥</span><span class="action-text">Open</span></label>
       <input id="fileInput" type="file" accept=".dot,.gv,.json,text/plain,text/vnd.graphviz,application/json" hidden />
-      <button id="exampleBtn" class="button compact">Example</button>
-      <button id="structuresBtn" class="button compact accent">Structures</button>
-      <button id="exportBtn" class="button compact primary">Export</button>
+      <button id="exampleBtn" class="button compact action-button" aria-label="Load example"><span class="action-icon">◫</span><span class="action-text">Example</span></button>
+      <button id="structuresBtn" class="button compact accent action-button" aria-label="Choose structure"><span class="action-icon">▦</span><span class="action-text">Structures</span></button>
+      <button id="exportBtn" class="button compact primary action-button" aria-label="Export"><span class="action-icon">↧</span><span class="action-text">Export</span></button>
     </div>
   </header>
 
   <main class="workspace">
     <aside class="toolbar glass" aria-label="Editing tools">
-      <button class="tool active" data-tool="select"><span>↖</span><small>Select</small></button>
-      <button class="tool" data-tool="add"><span>＋</span><small>Node</small></button>
-      <button class="tool" data-tool="child"><span>↳</span><small>Child</small></button>
-      <button class="tool" data-tool="connect"><span>⌁</span><small>Link</small></button>
-      <button class="tool" data-tool="edit"><span>✎</span><small>Edit</small></button>
-      <button id="deleteBtn" class="tool danger"><span>⌫</span><small>Delete</small></button>
+      <button type="button" class="tool active" data-tool="select"><span>↖</span><small>Select</small></button>
+      <button type="button" class="tool" data-tool="add"><span>＋</span><small>Node</small></button>
+      <button type="button" class="tool" data-tool="child"><span>↳</span><small>Child</small></button>
+      <button type="button" class="tool" data-tool="connect"><span>⌁</span><small>Link</small></button>
+      <button type="button" class="tool" data-tool="edit"><span>✎</span><small>Edit</small></button>
+      <button type="button" id="deleteBtn" class="tool danger"><span>⌫</span><small>Delete</small></button>
       <div class="tool-separator"></div>
-      <button id="undoBtn" class="tool"><span>↶</span><small>Undo</small></button>
-      <button id="redoBtn" class="tool"><span>↷</span><small>Redo</small></button>
-      <button id="fitBtn" class="tool"><span>⊡</span><small>Fit</small></button>
-      <button id="reflowBtn" class="tool"><span>⌁</span><small>Reflow</small></button>
+      <button type="button" id="undoBtn" class="tool"><span>↶</span><small>Undo</small></button>
+      <button type="button" id="redoBtn" class="tool"><span>↷</span><small>Redo</small></button>
+      <button type="button" id="fitBtn" class="tool"><span>⊡</span><small>Fit</small></button>
+      <button type="button" id="reflowBtn" class="tool"><span>⌁</span><small>Reflow</small></button>
     </aside>
 
     <section id="canvasWrap" class="canvas-wrap">

@@ -25,6 +25,35 @@ function refreshLabels(){cy.nodes().forEach(n=>n.data('displayLabel',n.data('sub
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('show'),1800)}
 function project(){return JSON.stringify({elements:cy.json().elements,pan:cy.pan(),zoom:cy.zoom(),structure:state.structure})}
 function snapshot(){if(state.restoring)return;const s=project();if(state.history.at(-1)!==s)state.history.push(s);if(state.history.length>60)state.history.shift();state.future=[];localStorage.setItem('dotcanvas-future-project',s);updateEmpty()}
+
+function setStructureUI(){
+  const info=STRUCTURES[state.structure]||STRUCTURES.mindmap;
+  const select=$('#layoutSelect');
+  if(select){
+    if(!select.options.length){
+      Object.entries(STRUCTURES).forEach(([key,item])=>{
+        const option=document.createElement('option');
+        option.value=key; option.textContent=item.name; select.appendChild(option);
+      });
+    }
+    select.value=state.structure;
+  }
+  const label=$('#structureText');
+  if(label) label.textContent=info.short;
+  const grid=$('#structureGrid');
+  if(grid){
+    grid.replaceChildren();
+    Object.entries(STRUCTURES).forEach(([key,item])=>{
+      const button=document.createElement('button');
+      button.type='button';
+      button.className='structure-card'+(key===state.structure?' active':'');
+      button.dataset.structure=key;
+      button.innerHTML=`<span class="mini ${item.icon}" aria-hidden="true"></span><span><b>${item.name}</b><span>${item.desc}</span></span>`;
+      button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();applyStructure(key)});
+      grid.appendChild(button);
+    });
+  }
+}
 function restore(raw){state.restoring=true;try{const p=typeof raw==='string'?JSON.parse(raw):raw;cy.elements().remove();cy.add(p.elements||[]);refreshLabels();state.structure=p.structure||'mindmap';setStructureUI();cy.pan(p.pan||{x:innerWidth/2,y:innerHeight/2});const restoredZoom=Number(p.zoom)||1;cy.zoom(cy.nodes().length<=15?Math.max(.55,restoredZoom):restoredZoom);cy.nodes().forEach(n=>n.data('locked')?n.lock():n.unlock())}finally{state.restoring=false;updateEmpty();updateInspector()}}
 function beforeChange(){}
 function updateEmpty(){$('#emptyState').hidden=cy.nodes().length>0;$('#statusText').textContent=cy.nodes().length?`${cy.nodes().length} nodes · ${cy.edges().length} links`:'Ready'}
@@ -66,13 +95,25 @@ function runStructure(type){
   if(type==='flowchart')cfg={...cfg,name:'breadthfirst',directed:true,roots:roots(),spacingFactor:1.25};
   if(type==='orgchart'||type==='tree')cfg={...cfg,name:'breadthfirst',directed:true,roots:roots(),spacingFactor:1.4};
   if(type==='concept')cfg={...cfg,name:'cose',idealEdgeLength:180,nodeRepulsion:900000,gravity:.13,numIter:900};
-  cy.layout(cfg).run();
-  done();
+  const layout=cy.layout(cfg);
+  cy.one('layoutstop',()=>{readableFit(animate?260:0);done()});
+  layout.run();
 }
 
 function template(type){const N=(id,label,x,y,extra={})=>({group:'nodes',data:{...defaults(label),id,...extra},position:{x,y}}),E=(a,b)=>({group:'edges',data:{id:`e_${uid()}`,source:a,target:b}});let e=[];if(type==='mindmap')e=[N('c','Central idea',0,0),N('a','Research',220,-130),N('b','Design',220,-40),N('d','Build',220,50),N('f','Launch',220,140),E('c','a'),E('c','b'),E('c','d'),E('c','f')];if(type==='flowchart')e=[N('s','Start',0,0,{shape:'ellipse'}),N('p','Process',220,0),N('q','Decision?',440,0,{shape:'diamond'}),N('y','Yes',650,-90),N('n','No',650,90),E('s','p'),E('p','q'),E('q','y'),E('q','n')];if(type==='fishbone')e=[N('effect','Observed effect',430,0),N('people','People',190,-130),N('process','Process',70,-80),N('tools','Tools',190,130),N('env','Environment',70,80),E('people','effect'),E('process','effect'),E('tools','effect'),E('env','effect')];if(type==='timeline')e=[N('t1','Discovery',0,-45),N('t2','Planning',220,45),N('t3','Build',440,-45),N('t4','Launch',660,45),E('t1','t2'),E('t2','t3'),E('t3','t4')];if(type==='matrix')e=['A1','A2','B1','B2','C1','C2'].map((x,i)=>N(x,x,(i%3)*210,Math.floor(i/3)*110));if(type==='gantt')e=[N('g1','Research · Week 1',0,0),N('g2','Design · Week 2',220,95),N('g3','Build · Weeks 3–4',440,190),N('g4','Launch · Week 5',700,285),E('g1','g2'),E('g2','g3'),E('g3','g4')];if(type==='orgchart')e=[N('ceo','Director',0,0),N('ops','Operations',-220,150),N('prod','Product',0,150),N('sales','Sales',220,150),E('ceo','ops'),E('ceo','prod'),E('ceo','sales')];if(type==='tree')e=[N('root','Root',0,0),N('l','Branch A',-180,140),N('r','Branch B',180,140),N('l1','Leaf A1',-270,280),N('l2','Leaf A2',-90,280),N('r1','Leaf B1',90,280),N('r2','Leaf B2',270,280),E('root','l'),E('root','r'),E('l','l1'),E('l','l2'),E('r','r1'),E('r','r2')];if(type==='concept')e=[N('c','Core concept',0,0),N('a','Related idea',220,-130),N('b','Evidence',240,100),N('d','Context',-220,100),N('f','Outcome',-220,-130),E('c','a'),E('c','b'),E('c','d'),E('c','f'),E('a','b'),E('d','f')];if(type==='bubble')e=[N('c','Main topic',0,0,{shape:'ellipse',size:130}),N('a','Idea A',190,0,{shape:'ellipse',size:100}),N('b','Idea B',0,190,{shape:'ellipse',size:110}),N('d','Idea C',-190,0,{shape:'ellipse',size:90}),N('f','Idea D',0,-190,{shape:'ellipse',size:105}),E('c','a'),E('c','b'),E('c','d'),E('c','f')];return e}
-function applyStructure(type){if($('#replaceWithTemplate').checked||!cy.nodes().length){cy.elements().remove();cy.add(template(type));refreshLabels()}runStructure(type);$('#structuresDialog').close();toast(`${STRUCTURES[type].name} applied`)}
-$('#structuresBtn').onclick=$('#emptyStructuresBtn').onclick=$('#openStructuresInspector').onclick=()=>{$('#structuresDialog').showModal();setStructureUI()};$('#reflowBtn').onclick=()=>runStructure(state.structure);$('#layoutSelect').onchange=e=>runStructure(e.target.value);
+function applyStructure(type){
+  const replace=$('#replaceWithTemplate')?.checked||!cy.nodes().length;
+  if(replace){cy.elements().remove();cy.add(template(type));refreshLabels()}
+  cy.nodes().unlock();
+  requestAnimationFrame(()=>{
+    cy.resize();
+    runStructure(type);
+    snapshot();
+  });
+  $('#structuresDialog')?.close();
+  toast(`${STRUCTURES[type].name} applied`);
+}
+$('#structuresBtn').onclick=$('#emptyStructuresBtn').onclick=$('#openStructuresInspector').onclick=e=>{e?.preventDefault();setStructureUI();$('#structuresDialog').showModal()};$('#reflowBtn').onclick=()=>runStructure(state.structure);$('#layoutSelect').onchange=e=>runStructure(e.target.value);
 $('#undoBtn').onclick=()=>{if(state.history.length<2)return;const current=state.history.pop();state.future.push(current);restore(state.history.at(-1))};$('#redoBtn').onclick=()=>{const next=state.future.pop();if(!next)return;state.history.push(next);restore(next)};
 function parseAttrs(raw=''){const out={};const re=/(\w+)\s*=\s*("(?:\\.|[^"])*"|[^,\]\s]+)/g;let m;while((m=re.exec(raw)))out[m[1]]=m[2].replace(/^"|"$/g,'').replace(/\\n/g,'\n').replace(/\\"/g,'"');return out}
 function parseDot(dot){const clean=dot.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\/\/.*$/gm,'').replace(/#.*$/gm,'');const nodes=new Map(),edges=[];const edgeRe=/([A-Za-z_][\w.-]*|"[^"]+")\s*(->|--)\s*([A-Za-z_][\w.-]*|"[^"]+")\s*(?:\[([^\]]*)\])?/g;let m;const norm=s=>s.replace(/^"|"$/g,'');while((m=edgeRe.exec(clean))){const a=norm(m[1]),b=norm(m[3]);nodes.set(a,nodes.get(a)||{});nodes.set(b,nodes.get(b)||{});edges.push([a,b,m[2],parseAttrs(m[4])])}const statementRe=/(?:^|[;{}\n])\s*([A-Za-z_][\w.-]*|"[^"]+")\s*\[([^\]]+)\]/g;while((m=statementRe.exec(clean))){const id=norm(m[1]);if(['node','edge','graph'].includes(id))continue;nodes.set(id,{...(nodes.get(id)||{}),...parseAttrs(m[2])})}const elements=[];for(const [id,a] of nodes){const shapeMap={box:'rectangle',rect:'rectangle',ellipse:'ellipse',circle:'ellipse',diamond:'diamond',hexagon:'hexagon'};elements.push({group:'nodes',data:{...defaults(a.label||id),id,label:a.label||id,shape:shapeMap[a.shape]||'roundrectangle',fill:a.fillcolor||'#14263a',border:a.color||'#2d8cff',textColor:a.fontcolor||'#eef7ff'}})}edges.forEach(([a,b,op],i)=>elements.push({group:'edges',classes:op==='--'?'undirected':'',data:{id:`e_${i}_${uid()}`,source:a,target:b}}));return elements}
