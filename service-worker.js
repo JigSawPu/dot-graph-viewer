@@ -1,6 +1,6 @@
-const CACHE_VERSION = "dotcanvas-ui-v5-stable-controls";
+const CACHE_VERSION = "dotcanvas-ui-v6-safari-startup-fix";
 const APP_SHELL = [
-  "./", "./index.html", "./styles.css", "./app.js", "./manifest.webmanifest",
+  "./", "./index.html", "./styles.css?v=6", "./app.js?v=6", "./manifest.webmanifest",
   "./offline.html", "./sample.dot", "./icons/icon-192.png", "./icons/icon-512.png",
   "./icons/icon-maskable-512.png", "./icons/apple-touch-icon.png",
   "https://cdn.jsdelivr.net/npm/cytoscape@3.33.0/dist/cytoscape.min.js"

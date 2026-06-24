@@ -294,3 +294,29 @@ button,.button,.tool,.action-button,.icon-button{touch-action:manipulation}
  .inspector{bottom:calc(env(safe-area-inset-bottom) + 72px)!important}
  .canvas-wrap{padding-bottom:0!important}
 }
+
+/* v6 Safari interaction and live viewport repair */
+:root{--app-height:100dvh;--app-top:0px}
+html,body{height:var(--app-height)!important;max-height:var(--app-height)!important}
+body{touch-action:manipulation!important}
+.app-shell{
+  position:fixed!important;
+  top:var(--app-top)!important;
+  right:0!important;
+  bottom:auto!important;
+  left:0!important;
+  height:var(--app-height)!important;
+  max-height:var(--app-height)!important;
+}
+#cy{touch-action:none!important}
+button,.button,label.button,.tool,.action-button,.icon-button,.structure-card{
+  -webkit-tap-highlight-color:transparent;
+  pointer-events:auto!important;
+  position:relative;
+}
+dialog[open]{pointer-events:auto!important;z-index:1000!important}
+dialog::backdrop{pointer-events:auto}
+@media(max-width:760px){
+  .workspace,.canvas-wrap,#cy{height:100%!important;min-height:0!important}
+  .canvas-wrap{bottom:0!important}
+}

@@ -43,3 +43,7 @@ Use the sun/moon button in the top toolbar to switch between dark and light them
 - Node button now creates a node immediately in the center of the visible canvas.
 - Structure cards use delegated touch-safe handlers and reliably apply layouts.
 - The app shell is pinned to the complete iPhone viewport, extending the canvas behind the bottom controls.
+
+## v6 Safari repair
+
+This build fixes a JavaScript temporal-dead-zone startup error caused by accessing the Cytoscape variable before initialization. It also versions the CSS/JS asset URLs to bypass older service-worker cache entries and uses `visualViewport` to keep the canvas aligned with the actual standalone iPhone screen height.

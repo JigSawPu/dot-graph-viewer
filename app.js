@@ -1,6 +1,7 @@
 const $=s=>document.querySelector(s);const uid=()=>`n_${Math.random().toString(36).slice(2,9)}`;
 
 const THEME_KEY='dotcanvas-theme';
+let cy = null;
 function currentTheme(){return document.documentElement.dataset.theme||'dark'}
 function applyTheme(theme,{announce=false}={}){
   const next=theme==='light'?'light':'dark';
@@ -13,7 +14,7 @@ function applyTheme(theme,{announce=false}={}){
   const icon=document.querySelector('#themeIcon');
   if(btn){btn.setAttribute('aria-label',light?'Switch to dark theme':'Switch to light theme');btn.title=light?'Dark theme':'Light theme'}
   if(icon)icon.textContent=light?'☾':'☼';
-  if(typeof cy!=='undefined'){
+  if(cy){
     cy.style()
       .selector('node:selected').style({
         'border-color':light?'#1677e8':'#63d8ff',
@@ -46,7 +47,7 @@ const STRUCTURES={
 };
 const state={tool:'select',connectFrom:null,history:[],future:[],restoring:false,structure:'mindmap'};
 const defaults=(label='New node')=>{const light=currentTheme()==='light';return {id:uid(),label,subtitle:'',shape:'roundrectangle',size:150,fill:light?'#ffffff':'#14263a',textColor:light?'#183047':'#eef7ff',border:light?'#2385d7':'#2d8cff',locked:false}};
-const cy=cytoscape({container:$('#cy'),elements:[],minZoom:.2,maxZoom:4,wheelSensitivity:.18,boxSelectionEnabled:true,selectionType:'additive',style:[
+cy=cytoscape({container:$('#cy'),elements:[],minZoom:.2,maxZoom:4,wheelSensitivity:.18,boxSelectionEnabled:true,selectionType:'additive',style:[
  {selector:'node',style:{'shape':'data(shape)','width':'data(size)','height':58,'background-color':'data(fill)','border-width':1.5,'border-color':'data(border)','border-opacity':.8,'label':'data(displayLabel)','color':'data(textColor)','font-size':13,'font-weight':600,'text-wrap':'wrap','text-max-width':'130px','text-valign':'center','text-halign':'center','padding':'10px','shadow-blur':20,'shadow-color':'data(border)','shadow-opacity':.18,'shadow-offset-x':0,'shadow-offset-y':0,'overlay-opacity':0}},
  {selector:'node:selected',style:{'border-width':2.5,'border-color':'#63d8ff','shadow-blur':34,'shadow-color':'#2d8cff','shadow-opacity':.52,'background-color':'#19314b'}},
  {selector:'node.connect-source',style:{'border-color':'#ffb45c','shadow-color':'#ff9a3d','shadow-opacity':.7}},
@@ -153,8 +154,27 @@ function applyStructure(type){
     toast(`${STRUCTURES[type].name} applied`);
   }));
 }
-$('#structuresBtn').onclick=$('#emptyStructuresBtn').onclick=$('#openStructuresInspector').onclick=e=>{e?.preventDefault();setStructureUI();const d=$('#structuresDialog');if(!d.open)d.showModal()};
-$('#structureGrid').addEventListener('click',e=>{const card=e.target.closest('[data-structure]');if(!card)return;e.preventDefault();e.stopPropagation();applyStructure(card.dataset.structure)});$('#reflowBtn').onclick=()=>runStructure(state.structure);$('#layoutSelect').onchange=e=>runStructure(e.target.value);
+function openStructures(event){
+  event?.preventDefault();
+  event?.stopPropagation();
+  setStructureUI();
+  const dialog=$('#structuresDialog');
+  if(dialog && !dialog.open){
+    try{dialog.showModal()}catch(error){dialog.setAttribute('open','')}
+  }
+}
+[$('#structuresBtn'),$('#emptyStructuresBtn'),$('#openStructuresInspector')].forEach(button=>{
+  if(!button)return;
+  button.addEventListener('click',openStructures);
+});
+$('#structureGrid').addEventListener('click',event=>{
+  const card=event.target.closest('.structure-card[data-structure]');
+  if(!card)return;
+  event.preventDefault();
+  applyStructure(card.dataset.structure);
+});
+$('#reflowBtn').onclick=()=>runStructure(state.structure);
+$('#layoutSelect').onchange=e=>runStructure(e.target.value);
 $('#undoBtn').onclick=()=>{if(state.history.length<2)return;const current=state.history.pop();state.future.push(current);restore(state.history.at(-1))};$('#redoBtn').onclick=()=>{const next=state.future.pop();if(!next)return;state.history.push(next);restore(next)};
 function parseAttrs(raw=''){const out={};const re=/(\w+)\s*=\s*("(?:\\.|[^"])*"|[^,\]\s]+)/g;let m;while((m=re.exec(raw)))out[m[1]]=m[2].replace(/^"|"$/g,'').replace(/\\n/g,'\n').replace(/\\"/g,'"');return out}
 function parseDot(dot){const clean=dot.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\/\/.*$/gm,'').replace(/#.*$/gm,'');const nodes=new Map(),edges=[];const edgeRe=/([A-Za-z_][\w.-]*|"[^"]+")\s*(->|--)\s*([A-Za-z_][\w.-]*|"[^"]+")\s*(?:\[([^\]]*)\])?/g;let m;const norm=s=>s.replace(/^"|"$/g,'');while((m=edgeRe.exec(clean))){const a=norm(m[1]),b=norm(m[3]);nodes.set(a,nodes.get(a)||{});nodes.set(b,nodes.get(b)||{});edges.push([a,b,m[2],parseAttrs(m[4])])}const statementRe=/(?:^|[;{}\n])\s*([A-Za-z_][\w.-]*|"[^"]+")\s*\[([^\]]+)\]/g;while((m=statementRe.exec(clean))){const id=norm(m[1]);if(['node','edge','graph'].includes(id))continue;nodes.set(id,{...(nodes.get(id)||{}),...parseAttrs(m[2])})}const elements=[];for(const [id,a] of nodes){const shapeMap={box:'rectangle',rect:'rectangle',ellipse:'ellipse',circle:'ellipse',diamond:'diamond',hexagon:'hexagon'};elements.push({group:'nodes',data:{...defaults(a.label||id),id,label:a.label||id,shape:shapeMap[a.shape]||'roundrectangle',fill:a.fillcolor||'#14263a',border:a.color||'#2d8cff',textColor:a.fontcolor||'#eef7ff'}})}edges.forEach(([a,b,op],i)=>elements.push({group:'edges',classes:op==='--'?'undirected':'',data:{id:`e_${i}_${uid()}`,source:a,target:b}}));return elements}
@@ -164,6 +184,28 @@ const esc=s=>String(s??'').replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\n
 function download(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}$('#exportBtn').onclick=()=>$('#exportDialog').showModal();document.querySelectorAll('[data-export]').forEach(b=>b.onclick=()=>{const type=b.dataset.export;if(type==='dot')download(new Blob([toDot()],{type:'text/vnd.graphviz'}),'dotcanvas-future.dot');if(type==='json')download(new Blob([project()],{type:'application/json'}),'dotcanvas-future.json');if(type==='png'||type==='jpg'){const uri=type==='png'?cy.png({full:true,scale:2,bg:'transparent'}):cy.jpg({full:true,scale:2,bg:currentTheme()==='light'?'#f5f9fd':'#040c17'});const a=document.createElement('a');a.href=uri;a.download=`dotcanvas-future.${type}`;a.click()}$('#exportDialog').close()});document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?$('#redoBtn').click():$('#undoBtn').click()}if((e.key==='Delete'||e.key==='Backspace')&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName))$('#deleteBtn').click()});
 const saved=localStorage.getItem('dotcanvas-future-project');if(saved){restore(saved);state.history=[saved]}else{snapshot()}setStructureUI();updateEmpty();
 
+
+// Keep the standalone iPhone canvas matched to Safari's live visual viewport.
+function syncAppViewport(){
+  const viewport=window.visualViewport;
+  const height=Math.round(viewport?.height||window.innerHeight);
+  const top=Math.round(viewport?.offsetTop||0);
+  document.documentElement.style.setProperty('--app-height',`${height}px`);
+  document.documentElement.style.setProperty('--app-top',`${top}px`);
+  requestAnimationFrame(()=>cy?.resize());
+}
+syncAppViewport();
+window.addEventListener('resize',syncAppViewport,{passive:true});
+window.addEventListener('orientationchange',()=>setTimeout(syncAppViewport,120),{passive:true});
+window.visualViewport?.addEventListener('resize',syncAppViewport,{passive:true});
+window.visualViewport?.addEventListener('scroll',syncAppViewport,{passive:true});
+
+document.querySelectorAll('dialog .modal-head .icon-button').forEach(button=>{
+  button.addEventListener('click',event=>{
+    event.preventDefault();
+    button.closest('dialog')?.close();
+  });
+});
 
 // Progressive Web App support
 (function setupPWA(){
