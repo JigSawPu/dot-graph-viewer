@@ -272,3 +272,25 @@ html[data-theme="light"] #themeBtn .action-icon{transform:rotate(-12deg)}
   html[data-theme="light"] .tool-separator{background:rgba(35,66,94,.14)}
   html[data-theme="light"] .canvas-hud{background:var(--hud-bg);color:var(--text);border-color:rgba(51,99,142,.15)}
 }
+
+
+/* Stable mobile viewport + interaction pass v5 */
+html,body{position:fixed!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;padding:0!important;margin:0!important;overflow:hidden!important}
+body{touch-action:none}
+.app-shell{position:absolute!important;inset:0!important;width:auto!important;height:auto!important;min-height:0!important;padding:max(6px,env(safe-area-inset-top)) max(6px,env(safe-area-inset-right)) 0 max(6px,env(safe-area-inset-left))!important;display:grid!important;grid-template-rows:52px minmax(0,1fr)!important;gap:6px!important;overflow:hidden!important}
+.workspace{position:relative!important;width:100%!important;height:100%!important;min-height:0!important;margin:0!important;overflow:hidden!important}
+.canvas-wrap{position:absolute!important;inset:0!important;bottom:0!important;border-radius:22px 22px 0 0!important;border-bottom:0!important;overflow:hidden!important}
+#cy{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:2!important}
+.toolbar,.topbar,.inspector,.canvas-hud{pointer-events:auto!important}
+.canvas-wrap:after,.aurora{pointer-events:none!important}
+.structure-card{position:relative;z-index:1;touch-action:manipulation;cursor:pointer}
+.structure-card *{pointer-events:none}
+button,.button,.tool,.action-button,.icon-button{touch-action:manipulation}
+@media(max-width:760px){
+ .topbar{margin:0!important;width:100%!important;height:52px!important;min-height:52px!important}
+ .workspace{padding-bottom:0!important}
+ .toolbar{bottom:max(8px,calc(env(safe-area-inset-bottom) + 4px))!important;z-index:30!important}
+ .canvas-hud{bottom:calc(env(safe-area-inset-bottom) + 72px)!important;z-index:12!important}
+ .inspector{bottom:calc(env(safe-area-inset-bottom) + 72px)!important}
+ .canvas-wrap{padding-bottom:0!important}
+}

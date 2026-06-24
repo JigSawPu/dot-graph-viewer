@@ -37,3 +37,9 @@ This build fixes a JavaScript syntax error in the structure reflow function that
 ## Theme option
 
 Use the sun/moon button in the top toolbar to switch between dark and light themes. The selected theme is saved on the device and restored the next time the app opens.
+
+
+## v5 stability fixes
+- Node button now creates a node immediately in the center of the visible canvas.
+- Structure cards use delegated touch-safe handlers and reliably apply layouts.
+- The app shell is pinned to the complete iPhone viewport, extending the canvas behind the bottom controls.
