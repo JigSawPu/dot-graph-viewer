@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: dotglass
+    runtime: static
+    buildCommand: ""
+    staticPublishPath: .

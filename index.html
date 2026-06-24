@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1020" />
+  <meta name="description" content="A private, fluid Graphviz DOT file viewer that runs entirely in your browser." />
+  <title>DotGlass — Graphviz Viewer</title>
+  <link rel="preconnect" href="https://esm.sh" crossorigin>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="aurora aurora-a"></div><div class="aurora aurora-b"></div>
+  <main class="app-shell">
+    <header class="topbar glass">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">◇</div>
+        <div><h1>DotGlass</h1><p>Private Graphviz viewer</p></div>
+      </div>
+      <div class="top-actions">
+        <select id="engine" class="control" aria-label="Layout engine">
+          <option value="dot">dot</option><option value="neato">neato</option><option value="fdp">fdp</option>
+          <option value="sfdp">sfdp</option><option value="circo">circo</option><option value="twopi">twopi</option>
+        </select>
+        <button id="themeBtn" class="icon-btn" aria-label="Toggle theme" title="Toggle theme">☼</button>
+      </div>
+    </header>
+
+    <section class="workspace">
+      <aside class="sidebar glass" id="sidebar">
+        <div class="upload-zone" id="dropZone">
+          <input id="fileInput" type="file" accept=".dot,.gv,text/vnd.graphviz,text/plain" hidden />
+          <div class="upload-icon">＋</div>
+          <strong>Open a DOT file</strong>
+          <span>Tap here or drop a .dot / .gv file</span>
+          <button id="openBtn" class="primary-btn">Choose file</button>
+        </div>
+
+        <div class="section-head"><span>DOT source</span><button id="exampleBtn" class="text-btn">Example</button></div>
+        <textarea id="editor" spellcheck="false" aria-label="DOT source editor"></textarea>
+        <div class="editor-actions">
+          <button id="renderBtn" class="primary-btn grow">Render graph</button>
+          <button id="clearBtn" class="secondary-btn">Clear</button>
+        </div>
+        <div class="privacy-note"><span>●</span> Your file never leaves this browser.</div>
+      </aside>
+
+      <section class="viewer glass" id="viewer">
+        <div class="viewer-bar">
+          <div class="file-meta"><span class="status-dot" id="statusDot"></span><span id="fileName">example.dot</span></div>
+          <div class="viewer-actions">
+            <button id="zoomOutBtn" class="icon-btn" title="Zoom out">−</button>
+            <button id="fitBtn" class="icon-btn wide" title="Fit graph">Fit</button>
+            <button id="zoomInBtn" class="icon-btn" title="Zoom in">＋</button>
+            <button id="downloadBtn" class="icon-btn wide" title="Download SVG">SVG</button>
+            <button id="fullscreenBtn" class="icon-btn" title="Fullscreen">⛶</button>
+          </div>
+        </div>
+        <div id="canvas" class="canvas" tabindex="0" aria-label="Graph canvas">
+          <div class="grid"></div>
+          <div id="graphStage" class="graph-stage"></div>
+          <div id="emptyState" class="empty-state"><div class="orb">◇</div><h2>Your graph appears here</h2><p>Open a DOT file or edit the example, then tap Render.</p></div>
+          <div id="loading" class="loading" hidden><div class="spinner"></div><span>Rendering Graphviz…</span></div>
+        </div>
+        <div class="statusbar"><span id="graphStats">Ready</span><span>Pinch or scroll to zoom · drag to pan</span></div>
+      </section>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
