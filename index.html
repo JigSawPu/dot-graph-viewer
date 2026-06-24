@@ -4,6 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
   <meta name="theme-color" content="#06101d" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="DotCanvas" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <title>DotCanvas Future — visual graph studio</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -91,7 +97,14 @@
   <form method="dialog"><div class="modal-head"><h2>Export graph</h2><button class="icon-button" value="cancel">×</button></div><p>Download source, a project backup, or an image.</p><div class="export-grid"><button type="button" data-export="dot" class="export-option"><b>DOT</b><span>Graphviz source</span></button><button type="button" data-export="json" class="export-option"><b>JSON</b><span>Editable project</span></button><button type="button" data-export="png" class="export-option"><b>PNG</b><span>Transparent image</span></button><button type="button" data-export="jpg" class="export-option"><b>JPG</b><span>Dark background</span></button></div></form>
 </dialog>
 <div id="toast" class="toast glass" role="status"></div>
-<script src="https://cdn.jsdelivr.net/npm/cytoscape@3.33.0/dist/cytoscape.min.js"></script>
+<div id="installTip" class="install-tip glass" hidden>
+  <div><b>Install DotCanvas</b><span>Open Share, then choose “Add to Home Screen”.</span></div>
+  <button id="dismissInstallTip" class="icon-button" aria-label="Dismiss install tip">×</button>
+</div>
+<div id="updateNotice" class="update-notice glass" hidden>
+  <span>A new version is ready.</span><button id="reloadAppBtn" class="button compact primary">Update</button>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape@3.33.0/dist/cytoscape.min.js" crossorigin="anonymous"></script>
 <script src="app.js"></script>
 </body>
 </html>

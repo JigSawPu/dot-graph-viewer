@@ -3,3 +3,10 @@ services:
     name: dotcanvas-future
     runtime: static
     staticPublishPath: .
+    headers:
+      - path: /service-worker.js
+        name: Cache-Control
+        value: no-cache
+      - path: /manifest.webmanifest
+        name: Content-Type
+        value: application/manifest+json

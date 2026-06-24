@@ -1,28 +1,24 @@
-# DotCanvas Future
+# DotCanvas Future PWA
 
-A touch-first, futuristic DOT graph and mind-map editor that runs entirely in the browser.
+A touch-first DOT graph and diagram editor packaged as an installable Progressive Web App. It runs as a Render Static Site and requires no backend.
 
-## Features
+## Deploy
 
-- Infinite-feeling pan and zoom canvas
-- Draggable, editable card and bubble nodes
-- Luminous curved edges with glow
-- DOT and JSON import/export
-- PNG and JPG export
-- Local autosave, undo and redo
-- Ten structures: mind map, flowchart, fishbone, timeline, matrix, Gantt, organizational chart, tree, concept map and bubble map
-- Purpose-built starter templates for every structure
-- Mobile inspector and left editing toolbar
+Upload every file and folder in this directory to the root of a GitHub repository. In Render, create a Static Site with an empty build command and `.` as the publish directory. The included `render.yaml` can also be used as a Blueprint.
 
-## Deploy to Render
+## Install on iPhone
 
-Create a **Static Site** and use:
+1. Open the deployed URL in Safari.
+2. Tap Share.
+3. Choose **Add to Home Screen**.
+4. Launch DotCanvas from its Home Screen icon.
 
-- Build command: leave blank
-- Publish directory: `.`
+The app launches in standalone mode and caches its shell for offline use. Cytoscape is cached from jsDelivr during the first online installation, so open the app online once before relying on offline mode.
 
-Upload the contents of this folder to the root of the connected GitHub repository.
+## Updating
 
-## Notes
+Push changes to GitHub and let Render redeploy. Change `CACHE_VERSION` in `service-worker.js` whenever cached files change. Installed clients will show an update prompt when the new service worker is ready.
 
-The Gantt and matrix views are visual diagram layouts rather than full scheduling or spreadsheet engines. All graph data stays in the browser unless you manually export or upload a file.
+## Local data
+
+Projects are autosaved in browser localStorage. Export DOT or JSON backups regularly because deleting the PWA or clearing Safari website data can remove local projects.

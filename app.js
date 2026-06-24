@@ -54,3 +54,60 @@ $('#fileInput').onchange=async e=>{const f=e.target.files[0];if(!f)return;import
 const esc=s=>String(s??'').replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\n/g,'\\n');function toDot(){const lines=['digraph DotCanvas {','  graph [overlap=false, splines=curved];','  node [style=filled];'];cy.nodes().forEach(n=>{const d=n.data(),p=n.position(),shape={roundrectangle:'box',rectangle:'box',ellipse:'ellipse',diamond:'diamond',hexagon:'hexagon'}[d.shape]||'box';lines.push(`  "${esc(n.id())}" [label="${esc(d.label)}", shape=${shape}, fillcolor="${d.fill}", color="${d.border}", fontcolor="${d.textColor}", pos="${p.x.toFixed(1)},${(-p.y).toFixed(1)}!"];`)});cy.edges().forEach(e=>lines.push(`  "${esc(e.source().id())}" -> "${esc(e.target().id())}";`));lines.push('}');return lines.join('\n')}
 function download(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}$('#exportBtn').onclick=()=>$('#exportDialog').showModal();document.querySelectorAll('[data-export]').forEach(b=>b.onclick=()=>{const type=b.dataset.export;if(type==='dot')download(new Blob([toDot()],{type:'text/vnd.graphviz'}),'dotcanvas-future.dot');if(type==='json')download(new Blob([project()],{type:'application/json'}),'dotcanvas-future.json');if(type==='png'||type==='jpg'){const uri=type==='png'?cy.png({full:true,scale:2,bg:'transparent'}):cy.jpg({full:true,scale:2,bg:'#040c17'});const a=document.createElement('a');a.href=uri;a.download=`dotcanvas-future.${type}`;a.click()}$('#exportDialog').close()});document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?$('#redoBtn').click():$('#undoBtn').click()}if((e.key==='Delete'||e.key==='Backspace')&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName))$('#deleteBtn').click()});
 const saved=localStorage.getItem('dotcanvas-future-project');if(saved){restore(saved);state.history=[saved]}else{snapshot()}setStructureUI();updateEmpty();
+
+
+// Progressive Web App support
+(function setupPWA(){
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  document.documentElement.classList.toggle('standalone', standalone);
+
+  const installTip = document.querySelector('#installTip');
+  const dismissInstallTip = document.querySelector('#dismissInstallTip');
+  const updateNotice = document.querySelector('#updateNotice');
+  const reloadAppBtn = document.querySelector('#reloadAppBtn');
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const tipDismissed = localStorage.getItem('dotcanvas-install-tip-dismissed') === '1';
+
+  if (isIOS && !standalone && !tipDismissed && installTip) {
+    window.setTimeout(() => { installTip.hidden = false; }, 1200);
+  }
+  dismissInstallTip?.addEventListener('click', () => {
+    installTip.hidden = true;
+    localStorage.setItem('dotcanvas-install-tip-dismissed', '1');
+  });
+
+  if (!('serviceWorker' in navigator)) return;
+  let waitingWorker = null;
+
+  window.addEventListener('load', async () => {
+    try {
+      const registration = await navigator.serviceWorker.register('./service-worker.js', { scope: './' });
+
+      const showUpdate = worker => {
+        waitingWorker = worker;
+        if (updateNotice) updateNotice.hidden = false;
+      };
+      if (registration.waiting) showUpdate(registration.waiting);
+
+      registration.addEventListener('updatefound', () => {
+        const worker = registration.installing;
+        worker?.addEventListener('statechange', () => {
+          if (worker.state === 'installed' && navigator.serviceWorker.controller) showUpdate(worker);
+        });
+      });
+
+      reloadAppBtn?.addEventListener('click', () => {
+        waitingWorker?.postMessage({ type: 'SKIP_WAITING' });
+      });
+
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+      });
+    } catch (error) {
+      console.error('DotCanvas service worker registration failed:', error);
+    }
+  });
+})();
