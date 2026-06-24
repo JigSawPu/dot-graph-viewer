@@ -1,4 +1,4 @@
-const CACHE_VERSION = "dotcanvas-pwa-v2-mobile-layout";
+const CACHE_VERSION = "dotcanvas-mobile-clickfix-v1";
 const APP_SHELL = [
   "./", "./index.html", "./styles.css", "./app.js", "./manifest.webmanifest",
   "./offline.html", "./sample.dot", "./icons/icon-192.png", "./icons/icon-512.png",

@@ -40,9 +40,36 @@ bindData('#labelInput','label');bindData('#subtitleInput','subtitle');bindData('
 document.querySelectorAll('.tool[data-tool]').forEach(b=>b.onclick=()=>setTool(b.dataset.tool));$('#startNodeBtn').onclick=()=>addNode({x:0,y:0},'Central idea');$('#deleteBtn').onclick=()=>{const sel=cy.$(':selected');if(!sel.length)return;sel.remove();snapshot();updateInspector()};$('#duplicateBtn').onclick=()=>{const n=cy.$('node:selected').first();if(!n.length)return;const d={...n.data(),id:uid(),label:`${n.data('label')} copy`};cy.add({group:'nodes',data:d,position:{x:n.position('x')+50,y:n.position('y')+50}}).select();refreshLabels();snapshot();updateInspector()};$('#addChildInspectorBtn').onclick=addChild;function readableFit(duration=350){if(!cy.elements().length)return;cy.animate({fit:{eles:cy.elements(),padding:90},duration,complete:()=>{if(cy.nodes().length<=15&&cy.zoom()<.62){cy.zoom({level:.62,renderedPosition:{x:cy.width()/2,y:cy.height()/2}})}}})}$('#fitBtn').onclick=()=>readableFit(350);$('#closeInspector').onclick=()=>$('#inspector').classList.remove('open');
 function roots(){const r=cy.nodes().filter(n=>n.indegree()===0);return r.length?r:cy.nodes().first()}
 function posManual(type){const ns=cy.nodes().toArray(),n=ns.length;if(!n)return;const root=roots().first();const others=ns.filter(x=>x.id()!==root.id());if(type==='timeline'){ns.forEach((x,i)=>x.position({x:i*220,y:(i%2?45:-45)}));return}if(type==='matrix'){const cols=Math.max(2,Math.ceil(Math.sqrt(n)));ns.forEach((x,i)=>x.position({x:(i%cols)*210,y:Math.floor(i/cols)*110}));return}if(type==='gantt'){ns.forEach((x,i)=>x.position({x:(i%4)*210+Math.floor(i/4)*70,y:Math.floor(i/4)*95}));return}if(type==='fishbone'){root.position({x:430,y:0});others.forEach((x,i)=>{const row=Math.floor(i/2),up=i%2===0;x.position({x:250-row*105,y:up?-90-(row%2)*45:90+(row%2)*45})});return}if(type==='bubble'){root.position({x:0,y:0});others.forEach((x,i)=>{const a=i/Math.max(1,others.length)*Math.PI*2,r=180+(i%3)*22;x.position({x:Math.cos(a)*r,y:Math.sin(a)*r})});return}}
-function runStructure(type){state.structure=type;setStructureUI();const animate=$('#animateLayout').checked;const done=()=>{setTimeout(snapshot,animate?650:50)};if(['timeline','matrix','gantt','fishbone','bubble'].includes(type)){posManual(type);cy.animate({fit:{eles:cy.elements(),padding:90},duration:animate?450:0,complete:()=>{if(cy.nodes().length<=15&&cy.zoom()<.62)cy.zoom({level:.62,renderedPosition:{x:cy.width()/2,y:cy.height()/2}})});done();return}let cfg={fit:true,padding:100,animate,animationDuration:520};if(type==='mindmap')cfg={...cfg,name:'breadthfirst',directed:true,roots:roots(),spacingFactor:1.45};if(type==='flowchart')cfg={...cfg,name:'breadthfirst',directed:true,roots:roots(),spacingFactor:1.25};if(type==='orgchart'||type==='tree')cfg={...cfg,name:'breadthfirst',directed:true,roots:roots(),spacingFactor:1.4};if(type==='concept')cfg={...cfg,name:'cose',idealEdgeLength:180,nodeRepulsion:900000,gravity:.13,numIter:900};cy.layout(cfg).run();done()}
-function setStructureUI(){$('#layoutSelect').value=state.structure;$('#structureText').textContent=STRUCTURES[state.structure].short;document.querySelectorAll('.structure-card').forEach(c=>c.classList.toggle('active',c.dataset.type===state.structure))}
-Object.entries(STRUCTURES).forEach(([k,v])=>{const o=document.createElement('option');o.value=k;o.textContent=v.name;$('#layoutSelect').appendChild(o);const b=document.createElement('button');b.type='button';b.className='structure-card';b.dataset.type=k;b.innerHTML=`<i class="mini ${v.icon}"></i><div><b>${v.name}</b><span>${v.desc}</span></div>`;b.onclick=()=>applyStructure(k);$('#structureGrid').appendChild(b)});
+function runStructure(type){
+  state.structure=type;
+  setStructureUI();
+  const animate=$('#animateLayout').checked;
+  const done=()=>{setTimeout(snapshot,animate?650:50)};
+
+  if(['timeline','matrix','gantt','fishbone','bubble'].includes(type)){
+    posManual(type);
+    cy.animate({
+      fit:{eles:cy.elements(),padding:90},
+      duration:animate?450:0,
+      complete:()=>{
+        if(cy.nodes().length<=15&&cy.zoom()<.62){
+          cy.zoom({level:.62,renderedPosition:{x:cy.width()/2,y:cy.height()/2}});
+        }
+      }
+    });
+    done();
+    return;
+  }
+
+  let cfg={fit:true,padding:100,animate,animationDuration:520};
+  if(type==='mindmap')cfg={...cfg,name:'breadthfirst',directed:true,roots:roots(),spacingFactor:1.45};
+  if(type==='flowchart')cfg={...cfg,name:'breadthfirst',directed:true,roots:roots(),spacingFactor:1.25};
+  if(type==='orgchart'||type==='tree')cfg={...cfg,name:'breadthfirst',directed:true,roots:roots(),spacingFactor:1.4};
+  if(type==='concept')cfg={...cfg,name:'cose',idealEdgeLength:180,nodeRepulsion:900000,gravity:.13,numIter:900};
+  cy.layout(cfg).run();
+  done();
+}
+
 function template(type){const N=(id,label,x,y,extra={})=>({group:'nodes',data:{...defaults(label),id,...extra},position:{x,y}}),E=(a,b)=>({group:'edges',data:{id:`e_${uid()}`,source:a,target:b}});let e=[];if(type==='mindmap')e=[N('c','Central idea',0,0),N('a','Research',220,-130),N('b','Design',220,-40),N('d','Build',220,50),N('f','Launch',220,140),E('c','a'),E('c','b'),E('c','d'),E('c','f')];if(type==='flowchart')e=[N('s','Start',0,0,{shape:'ellipse'}),N('p','Process',220,0),N('q','Decision?',440,0,{shape:'diamond'}),N('y','Yes',650,-90),N('n','No',650,90),E('s','p'),E('p','q'),E('q','y'),E('q','n')];if(type==='fishbone')e=[N('effect','Observed effect',430,0),N('people','People',190,-130),N('process','Process',70,-80),N('tools','Tools',190,130),N('env','Environment',70,80),E('people','effect'),E('process','effect'),E('tools','effect'),E('env','effect')];if(type==='timeline')e=[N('t1','Discovery',0,-45),N('t2','Planning',220,45),N('t3','Build',440,-45),N('t4','Launch',660,45),E('t1','t2'),E('t2','t3'),E('t3','t4')];if(type==='matrix')e=['A1','A2','B1','B2','C1','C2'].map((x,i)=>N(x,x,(i%3)*210,Math.floor(i/3)*110));if(type==='gantt')e=[N('g1','Research · Week 1',0,0),N('g2','Design · Week 2',220,95),N('g3','Build · Weeks 3–4',440,190),N('g4','Launch · Week 5',700,285),E('g1','g2'),E('g2','g3'),E('g3','g4')];if(type==='orgchart')e=[N('ceo','Director',0,0),N('ops','Operations',-220,150),N('prod','Product',0,150),N('sales','Sales',220,150),E('ceo','ops'),E('ceo','prod'),E('ceo','sales')];if(type==='tree')e=[N('root','Root',0,0),N('l','Branch A',-180,140),N('r','Branch B',180,140),N('l1','Leaf A1',-270,280),N('l2','Leaf A2',-90,280),N('r1','Leaf B1',90,280),N('r2','Leaf B2',270,280),E('root','l'),E('root','r'),E('l','l1'),E('l','l2'),E('r','r1'),E('r','r2')];if(type==='concept')e=[N('c','Core concept',0,0),N('a','Related idea',220,-130),N('b','Evidence',240,100),N('d','Context',-220,100),N('f','Outcome',-220,-130),E('c','a'),E('c','b'),E('c','d'),E('c','f'),E('a','b'),E('d','f')];if(type==='bubble')e=[N('c','Main topic',0,0,{shape:'ellipse',size:130}),N('a','Idea A',190,0,{shape:'ellipse',size:100}),N('b','Idea B',0,190,{shape:'ellipse',size:110}),N('d','Idea C',-190,0,{shape:'ellipse',size:90}),N('f','Idea D',0,-190,{shape:'ellipse',size:105}),E('c','a'),E('c','b'),E('c','d'),E('c','f')];return e}
 function applyStructure(type){if($('#replaceWithTemplate').checked||!cy.nodes().length){cy.elements().remove();cy.add(template(type));refreshLabels()}runStructure(type);$('#structuresDialog').close();toast(`${STRUCTURES[type].name} applied`)}
 $('#structuresBtn').onclick=$('#emptyStructuresBtn').onclick=$('#openStructuresInspector').onclick=()=>{$('#structuresDialog').showModal();setStructureUI()};$('#reflowBtn').onclick=()=>runStructure(state.structure);$('#layoutSelect').onchange=e=>runStructure(e.target.value);

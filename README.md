@@ -27,3 +27,8 @@ Projects are autosaved in browser localStorage. Export DOT or JSON backups regul
 ## Mobile layout update
 
 This build fixes duplicated iPhone safe-area spacing, aligns the header and canvas, makes the workspace use `100dvh`, compacts the left toolbar, anchors the HUD, and keeps small graphs at a readable minimum zoom.
+
+
+## Click-fix release
+
+This build fixes a JavaScript syntax error in the structure reflow function that prevented the application script from loading, which made every UI button appear unresponsive. The service-worker cache version has also been increased so installed copies receive the corrected script.
