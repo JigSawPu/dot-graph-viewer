@@ -1,5 +1,5 @@
 services:
   - type: web
-    name: dotcanvas
+    name: dotcanvas-future
     runtime: static
     staticPublishPath: .

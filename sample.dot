@@ -1,9 +1,8 @@
-digraph Project {
-  idea [label="Central idea", shape=ellipse, fillcolor="#7b88ff"];
-  research [label="Research"];
-  design [label="Design"];
-  build [label="Build"];
-  idea -> research;
-  idea -> design;
-  idea -> build;
+digraph FutureMap {
+  core [label="Future graph studio", shape=ellipse, fillcolor="#173452", color="#38a8ff"];
+  visual [label="Luminous edges"];
+  canvas [label="Infinite canvas"];
+  edit [label="Touch editing"];
+  layouts [label="10 diagram structures"];
+  core -> visual; core -> canvas; core -> edit; core -> layouts;
 }

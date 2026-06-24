@@ -1,30 +1,28 @@
-# DotCanvas
+# DotCanvas Future
 
-A touch-first, static DOT graph and mind-map editor built with Cytoscape.js.
+A touch-first, futuristic DOT graph and mind-map editor that runs entirely in the browser.
 
 ## Features
 
-- Infinite pan/zoom canvas
-- Touch-draggable nodes
-- Create, connect, edit, duplicate, lock, and delete nodes
-- Mind-map, hierarchy, radial, organic, circle, and grid reflow
-- DOT and JSON import
-- DOT, JSON, PNG, and JPG export
-- Undo/redo and automatic browser storage
-- No backend and no file uploads to a server
+- Infinite-feeling pan and zoom canvas
+- Draggable, editable card and bubble nodes
+- Luminous curved edges with glow
+- DOT and JSON import/export
+- PNG and JPG export
+- Local autosave, undo and redo
+- Ten structures: mind map, flowchart, fishbone, timeline, matrix, Gantt, organizational chart, tree, concept map and bubble map
+- Purpose-built starter templates for every structure
+- Mobile inspector and left editing toolbar
 
-## Deploy to Render from GitHub
+## Deploy to Render
 
-1. Upload every file in this folder to the root of a GitHub repository.
-2. In Render, create a **Static Site** and connect the repository.
-3. Leave the build command blank.
-4. Set the publish directory to `.`.
-5. Deploy.
+Create a **Static Site** and use:
 
-`render.yaml` is included if you prefer Render Blueprint deployment.
+- Build command: leave blank
+- Publish directory: `.`
+
+Upload the contents of this folder to the root of the connected GitHub repository.
 
 ## Notes
 
-DOT import supports common node declarations, labels, colors, shapes, and directed or undirected edges. Very advanced DOT constructs such as HTML labels, nested clusters, ports, and macros may be simplified during import.
-
-Cytoscape.js is loaded from jsDelivr, so the app needs internet access on first load. Your graph data stays in the browser.
+The Gantt and matrix views are visual diagram layouts rather than full scheduling or spreadsheet engines. All graph data stays in the browser unless you manually export or upload a file.

@@ -3,105 +3,95 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
-  <meta name="theme-color" content="#10131b" />
-  <title>DotCanvas — touch graph editor</title>
+  <meta name="theme-color" content="#06101d" />
+  <title>DotCanvas Future — visual graph studio</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="app-shell">
-    <header class="topbar glass">
-      <div class="brand"><span class="brand-mark">◌</span><span>DotCanvas</span></div>
-      <div class="top-actions">
-        <label class="button compact" for="fileInput">Open</label>
-        <input id="fileInput" type="file" accept=".dot,.gv,text/vnd.graphviz,text/plain" hidden />
-        <button id="exampleBtn" class="button compact">Example</button>
-        <button id="exportBtn" class="button compact primary">Export</button>
+<div class="app-shell">
+  <header class="topbar glass">
+    <div class="brand"><span class="brand-mark">◈</span><div><b>DotCanvas</b><small>FUTURE GRAPH STUDIO</small></div></div>
+    <div class="top-actions">
+      <label class="button compact" for="fileInput">Open</label>
+      <input id="fileInput" type="file" accept=".dot,.gv,.json,text/plain,text/vnd.graphviz,application/json" hidden />
+      <button id="exampleBtn" class="button compact">Example</button>
+      <button id="structuresBtn" class="button compact accent">Structures</button>
+      <button id="exportBtn" class="button compact primary">Export</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="toolbar glass" aria-label="Editing tools">
+      <button class="tool active" data-tool="select"><span>↖</span><small>Select</small></button>
+      <button class="tool" data-tool="add"><span>＋</span><small>Node</small></button>
+      <button class="tool" data-tool="child"><span>↳</span><small>Child</small></button>
+      <button class="tool" data-tool="connect"><span>⌁</span><small>Link</small></button>
+      <button class="tool" data-tool="edit"><span>✎</span><small>Edit</small></button>
+      <button id="deleteBtn" class="tool danger"><span>⌫</span><small>Delete</small></button>
+      <div class="tool-separator"></div>
+      <button id="undoBtn" class="tool"><span>↶</span><small>Undo</small></button>
+      <button id="redoBtn" class="tool"><span>↷</span><small>Redo</small></button>
+      <button id="fitBtn" class="tool"><span>⊡</span><small>Fit</small></button>
+      <button id="reflowBtn" class="tool"><span>⌁</span><small>Reflow</small></button>
+    </aside>
+
+    <section id="canvasWrap" class="canvas-wrap">
+      <div class="aurora a1"></div><div class="aurora a2"></div>
+      <div id="cy" aria-label="Infinite graph canvas"></div>
+      <div class="canvas-hud glass">
+        <span><i class="live-dot"></i><span id="statusText">Ready</span></span>
+        <span id="structureText">Mind map</span>
+        <span id="zoomText">100%</span>
       </div>
-    </header>
-
-    <main class="workspace">
-      <aside class="toolbar glass" aria-label="Editing tools">
-        <button class="tool active" data-tool="select" title="Select and move"><span>↖</span><small>Select</small></button>
-        <button class="tool" data-tool="add" title="Add node"><span>＋</span><small>Node</small></button>
-        <button class="tool" data-tool="child" title="Add child"><span>↳</span><small>Child</small></button>
-        <button class="tool" data-tool="connect" title="Connect two nodes"><span>⤴</span><small>Link</small></button>
-        <button class="tool" data-tool="edit" title="Edit selected node"><span>✎</span><small>Edit</small></button>
-        <button id="deleteBtn" class="tool danger" title="Delete selection"><span>⌫</span><small>Delete</small></button>
-        <div class="tool-separator"></div>
-        <button id="undoBtn" class="tool" title="Undo"><span>↶</span><small>Undo</small></button>
-        <button id="redoBtn" class="tool" title="Redo"><span>↷</span><small>Redo</small></button>
-        <button id="fitBtn" class="tool" title="Fit graph"><span>⊡</span><small>Fit</small></button>
-        <button id="reflowBtn" class="tool" title="Reflow graph"><span>⌁</span><small>Reflow</small></button>
-      </aside>
-
-      <section id="canvasWrap" class="canvas-wrap">
-        <div id="cy" aria-label="Infinite graph canvas"></div>
-        <div class="canvas-hud glass">
-          <span id="statusText">Start with a node or open a DOT file</span>
-          <span id="zoomText">100%</span>
-        </div>
-        <div id="emptyState" class="empty-state glass">
-          <div class="empty-icon">◌</div>
-          <h1>Your infinite graph canvas</h1>
-          <p>Tap <b>Node</b>, open a DOT file, or load the example.</p>
-          <button id="startNodeBtn" class="button primary">Create first node</button>
-        </div>
-      </section>
-
-      <aside id="inspector" class="inspector glass">
-        <div class="inspector-head">
-          <div><small>SELECTION</small><h2 id="inspectorTitle">No node selected</h2></div>
-          <button id="closeInspector" class="icon-button">×</button>
-        </div>
-        <div id="nodeControls" class="control-stack disabled">
-          <label>Label<textarea id="labelInput" rows="3" placeholder="Node label"></textarea></label>
-          <div class="control-row">
-            <label>Shape<select id="shapeInput"><option value="roundrectangle">Rounded</option><option value="rectangle">Rectangle</option><option value="ellipse">Ellipse</option><option value="diamond">Diamond</option><option value="hexagon">Hexagon</option></select></label>
-            <label>Size<input id="sizeInput" type="range" min="50" max="180" value="90" /></label>
-          </div>
-          <div class="control-row">
-            <label>Fill<input id="fillInput" type="color" value="#6d7cff" /></label>
-            <label>Text<input id="textInput" type="color" value="#ffffff" /></label>
-            <label>Border<input id="borderInput" type="color" value="#aeb7ff" /></label>
-          </div>
-          <label class="switch-row"><span>Lock position</span><input id="lockInput" type="checkbox" /></label>
-          <div class="inspector-actions">
-            <button id="duplicateBtn" class="button">Duplicate</button>
-            <button id="addChildInspectorBtn" class="button primary">Add child</button>
-          </div>
-        </div>
-
-        <div class="layout-panel">
-          <small>REFLOW</small>
-          <select id="layoutSelect">
-            <option value="mindmap">Mind map →</option>
-            <option value="vertical">Hierarchy ↓</option>
-            <option value="radial">Radial</option>
-            <option value="organic">Organic</option>
-            <option value="circle">Circle</option>
-            <option value="grid">Grid</option>
-          </select>
-          <label class="switch-row"><span>Animate reflow</span><input id="animateLayout" type="checkbox" checked /></label>
-        </div>
-      </aside>
-    </main>
-  </div>
-
-  <dialog id="exportDialog" class="modal glass">
-    <form method="dialog">
-      <div class="modal-head"><h2>Export graph</h2><button class="icon-button" value="cancel">×</button></div>
-      <p>Download an editable DOT file, a project backup, or an image.</p>
-      <div class="export-grid">
-        <button type="button" data-export="dot" class="export-option"><b>DOT</b><span>Graphviz source</span></button>
-        <button type="button" data-export="json" class="export-option"><b>JSON</b><span>Editable project</span></button>
-        <button type="button" data-export="png" class="export-option"><b>PNG</b><span>Transparent image</span></button>
-        <button type="button" data-export="jpg" class="export-option"><b>JPG</b><span>White background</span></button>
+      <div id="emptyState" class="empty-state glass">
+        <div class="empty-icon">◈</div>
+        <h1>Build connected ideas</h1>
+        <p>Create nodes, import DOT, or choose a diagram structure.</p>
+        <div class="empty-actions"><button id="startNodeBtn" class="button primary">Create first node</button><button id="emptyStructuresBtn" class="button">Choose structure</button></div>
       </div>
-    </form>
-  </dialog>
+    </section>
 
-  <div id="toast" class="toast glass" role="status"></div>
-  <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.33.0/dist/cytoscape.min.js"></script>
-  <script src="app.js"></script>
+    <aside id="inspector" class="inspector glass">
+      <div class="inspector-head"><div><small>SELECTION</small><h2 id="inspectorTitle">No node selected</h2></div><button id="closeInspector" class="icon-button">×</button></div>
+      <div id="nodeControls" class="control-stack disabled">
+        <label>Label<textarea id="labelInput" rows="3" placeholder="Node label"></textarea></label>
+        <label>Subtitle<input id="subtitleInput" type="text" placeholder="Optional detail" /></label>
+        <div class="control-row">
+          <label>Shape<select id="shapeInput"><option value="roundrectangle">Card</option><option value="rectangle">Rectangle</option><option value="ellipse">Bubble</option><option value="diamond">Decision</option><option value="hexagon">Hexagon</option></select></label>
+          <label>Size<input id="sizeInput" type="range" min="80" max="240" value="150" /></label>
+        </div>
+        <div class="control-row color-row">
+          <label>Fill<input id="fillInput" type="color" value="#162438" /></label>
+          <label>Text<input id="textInput" type="color" value="#eef7ff" /></label>
+          <label>Glow<input id="borderInput" type="color" value="#2d8cff" /></label>
+        </div>
+        <label class="switch-row"><span>Lock position</span><input id="lockInput" type="checkbox" /></label>
+        <div class="inspector-actions"><button id="duplicateBtn" class="button">Duplicate</button><button id="addChildInspectorBtn" class="button primary">Add child</button></div>
+      </div>
+      <div class="layout-panel">
+        <small>ACTIVE STRUCTURE</small>
+        <select id="layoutSelect"></select>
+        <label class="switch-row"><span>Animate reflow</span><input id="animateLayout" type="checkbox" checked /></label>
+        <button id="openStructuresInspector" class="button">Browse all structures</button>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<dialog id="structuresDialog" class="modal structures-modal glass">
+  <form method="dialog">
+    <div class="modal-head"><div><small>DIAGRAM LIBRARY</small><h2>Choose a structure</h2></div><button class="icon-button" value="cancel">×</button></div>
+    <p class="modal-copy">Apply a new arrangement to the current graph, or start from a purpose-built template.</p>
+    <div id="structureGrid" class="structure-grid"></div>
+    <label class="switch-row template-toggle"><span>Replace current graph with template</span><input id="replaceWithTemplate" type="checkbox" /></label>
+  </form>
+</dialog>
+
+<dialog id="exportDialog" class="modal glass">
+  <form method="dialog"><div class="modal-head"><h2>Export graph</h2><button class="icon-button" value="cancel">×</button></div><p>Download source, a project backup, or an image.</p><div class="export-grid"><button type="button" data-export="dot" class="export-option"><b>DOT</b><span>Graphviz source</span></button><button type="button" data-export="json" class="export-option"><b>JSON</b><span>Editable project</span></button><button type="button" data-export="png" class="export-option"><b>PNG</b><span>Transparent image</span></button><button type="button" data-export="jpg" class="export-option"><b>JPG</b><span>Dark background</span></button></div></form>
+</dialog>
+<div id="toast" class="toast glass" role="status"></div>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape@3.33.0/dist/cytoscape.min.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
