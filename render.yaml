@@ -2,8 +2,13 @@ services:
   - type: web
     name: dotcanvas-react
     runtime: static
-    buildCommand: npm ci && npm run build
+    buildCommand: npm ci --registry=https://registry.npmjs.org --no-audit --no-fund && npm run build
     staticPublishPath: ./dist
+    envVars:
+      - key: NODE_VERSION
+        value: 22.23.0
+      - key: SKIP_INSTALL_DEPS
+        value: "true"
     headers:
       - path: /sw.js
         name: Cache-Control

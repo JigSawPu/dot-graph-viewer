@@ -1,54 +1,29 @@
-# Render configuration
+# Render deployment setup
 
-## Recommended: Static Site
+This project is a **Render Static Site**.
 
-DotCanvas does not require a server for its current features.
+## Important fix in this build
 
-### Dashboard setup
+The previous package lock contained dependency URLs for an internal build registry that Render cannot access. This build uses the public npm registry, pins Node.js 22.23.0 with npm 10.9.4, and disables Render's automatic dependency installation so dependencies are installed exactly once by the build command.
 
-1. Upload this entire project to the root of a GitHub repository.
-2. In Render, select **New → Static Site**.
-3. Connect the GitHub repository.
-4. Use these values:
+## Existing Render site
 
-- Branch: `main`
-- Root Directory: leave blank
-- Build Command: `npm ci && npm run build`
-- Publish Directory: `dist`
-- Auto-Deploy: enabled
-
-5. Create the site.
-
-The `.node-version` file pins Node.js to `24.14.1`.
+1. Upload all files in this project to the repository root, including hidden files `.node-version` and `.npmrc`.
+2. Open the Static Site in Render.
+3. Open **Environment** and set:
+   - `NODE_VERSION` = `22.23.0`
+   - `SKIP_INSTALL_DEPS` = `true`
+4. Open **Settings** and set:
+   - Build Command: `npm ci --registry=https://registry.npmjs.org --no-audit --no-fund && npm run build`
+   - Publish Directory: `dist`
+   - Root Directory: leave blank
+5. Make sure the connected branch is the branch containing these files.
+6. Use **Manual Deploy → Clear build cache & deploy**.
 
 ## Blueprint setup
 
-The included `render.yaml` defines the same Static Site automatically.
+The included `render.yaml` already supplies the correct build command, publish directory, Node version, and `SKIP_INSTALL_DEPS=true`. If the site was created manually rather than from a Blueprint, dashboard settings can override or differ from this file, so verify the settings above.
 
-1. In Render, select **New → Blueprint**.
-2. Connect the repository.
-3. Select the `render.yaml` file.
-4. Review and apply the Blueprint.
+## Expected beginning of the corrected log
 
-## First PWA deployment
-
-Because the earlier DotCanvas build used a different service worker:
-
-1. Remove the old DotCanvas icon from the iPhone Home Screen.
-2. Open the new Render URL in Safari.
-3. Confirm that the React version loads.
-4. Tap **Share → Add to Home Screen**.
-
-Future releases can update through the PWA update notice.
-
-## When to use a Render Web Service
-
-Keep this as a Static Site until you need server-backed features. Add a Web Service later for:
-
-- authentication
-- cloud document storage
-- device synchronization
-- public or private share links
-- permissions and comments
-- live collaboration
-- server-managed revision history
+The build should show Node.js 22.23.0. It should not perform Render's separate automatic `Installing dependencies with npm...` phase. Instead, it should proceed to the configured build command, run `npm ci`, then `npm run build`, and publish `dist`.
