@@ -1,0 +1,91 @@
+.app-shell {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: var(--visual-top);
+  height: var(--visual-height);
+  overflow: hidden;
+  background: var(--color-bg);
+  isolation: isolate;
+}
+
+.canvas-shell {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 14% 20%, color-mix(in srgb, var(--color-accent) 9%, transparent), transparent 28%),
+    radial-gradient(circle at 84% 76%, rgba(80, 205, 187, 0.07), transparent 25%),
+    var(--color-canvas);
+}
+
+.canvas-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: radial-gradient(circle, var(--color-grid) 1px, transparent 1.25px);
+  background-size: 22px 22px;
+}
+
+.graph-canvas { position: absolute; inset: 0; z-index: 2; touch-action: none; }
+
+.topbar {
+  position: absolute;
+  z-index: 30;
+  top: calc(var(--safe-top) + var(--ui-gap));
+  left: calc(var(--safe-left) + var(--ui-gap));
+  right: calc(var(--safe-right) + var(--ui-gap));
+  min-height: var(--topbar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  pointer-events: none;
+}
+.topbar > * { pointer-events: auto; }
+
+.bottom-dock {
+  position: absolute;
+  z-index: 30;
+  left: 50%;
+  bottom: calc(var(--safe-bottom) + var(--ui-gap));
+  transform: translateX(-50%);
+  height: var(--dock-height);
+  max-width: calc(100% - var(--safe-left) - var(--safe-right) - 24px);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  touch-action: pan-x;
+}
+.bottom-dock::-webkit-scrollbar { display: none; }
+
+.floating-panel {
+  position: absolute;
+  z-index: 40;
+  right: calc(var(--safe-right) + var(--ui-gap));
+  bottom: calc(var(--safe-bottom) + var(--dock-height) + 24px);
+  width: min(var(--panel-width), calc(100% - 24px));
+  max-height: min(72vh, 720px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-scroll { overflow-y: auto; overscroll-behavior: contain; padding-right: 2px; }
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: max(18px, var(--safe-top)) max(14px, var(--safe-right)) max(18px, var(--safe-bottom)) max(14px, var(--safe-left));
+  background: rgba(18, 18, 25, 0.3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
