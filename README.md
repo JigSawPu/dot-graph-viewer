@@ -1,177 +1,54 @@
-# DotCanvas — React + TypeScript + Vite
+# DotCanvas Studio v7
 
-DotCanvas is a responsive, touch-first DOT graph, mind-map, and diagram editor. This release replaces the previous large vanilla JavaScript UI with a component-based React architecture, strict TypeScript types, a Vite build, and a reusable responsive design system.
+A mobile-first Progressive Web App for opening DOT files and editing graphs, mind maps, and structured diagrams directly in the browser.
 
-## Included features
+## What this version adds
 
-- Infinite Cytoscape.js canvas with pan, pinch zoom, selection, and draggable nodes
-- Add node, add child, connect nodes, delete, duplicate, lock position, fit, zoom, undo, and redo
-- DOT and editable JSON import
-- DOT, JSON, transparent PNG, and JPG export
-- Ten diagram structures:
-  - Traditional mind map
-  - Flowchart
-  - Fishbone diagram
-  - Timeline
-  - Matrix
-  - Gantt chart
-  - Organizational chart
-  - Tree diagram
-  - Concept map
-  - Bubble map
-- Node title, subtitle, notes, shape, width, icon, tag, colors, and branch styling
-- Smooth, angular, straight, and elbow connections
-- Light and dark themes
-- Local autosave
-- Installable PWA with offline app-shell caching
-- Responsive compact, tablet, and desktop layouts
-- iPhone safe-area and Visual Viewport handling
+- A light, paper-like mind-map interface inspired by modern native mobile diagram apps
+- Smooth pastel branch colors and rounded content cards
+- Focus mode for isolating a selected topic and its descendants
+- Status tags displayed beside nodes
+- Custom tags with editable names and colors
+- Node icon picker
+- Node notes and subtitles
+- Node image attachments stored inside JSON project backups
+- A floating style panel with palettes, node colors, branch colors, connection styles, and line width
+- Search across titles, subtitles, notes, icons, and tags
+- A compact floating bottom toolbar
+- Project sharing through the iOS share sheet when supported
+- DOT, JSON, PNG, and JPG export
+- Ten structure families: mind map, flowchart, fishbone, timeline, matrix, Gantt, organization chart, tree, concept map, and bubble map
+- Local autosave, undo/redo, light/dark themes, and PWA installation
 
-## Architecture
+## Static site or web service?
 
-```text
-src/
-├── components/
-│   ├── BottomDock.tsx
-│   ├── ExportDialog.tsx
-│   ├── GraphCanvas.tsx
-│   ├── InspectorPanel.tsx
-│   ├── MorePanel.tsx
-│   ├── PwaStatus.tsx
-│   ├── StructureDialog.tsx
-│   └── TopBar.tsx
-├── hooks/
-│   ├── useDocumentHistory.ts
-│   └── useVisualViewport.ts
-├── lib/
-│   ├── constants.ts
-│   ├── document.ts
-│   ├── dot.ts
-│   ├── layouts.ts
-│   ├── storage.ts
-│   └── templates.ts
-├── styles/
-│   ├── base.css
-│   ├── components.css
-│   ├── layout.css
-│   ├── responsive.css
-│   └── tokens.css
-├── App.tsx
-├── main.tsx
-└── types.ts
-```
+This package remains a Render **Static Site**. All current editing features run on the device and do not require a server.
 
-The design system is centralized in `src/styles/tokens.css`. Components use shared spacing, control sizes, radii, colors, safe-area variables, shadows, and responsive modes instead of independent device-specific offsets.
+A backend would only be required for features such as:
 
-## Local development
+- user accounts
+- cloud synchronization between devices
+- shared editable links
+- live multi-user collaboration
+- server-managed version history
+- team workspaces and permissions
 
-Requirements:
+The UI includes a Share action, but in this static build it shares or downloads an editable JSON project file. It is not real-time collaboration.
 
-- Node.js 24.x
-- npm
+## Deploy to Render
 
-Commands:
+1. Upload every file in this folder to the root of the GitHub repository.
+2. In Render, create or keep a **Static Site**.
+3. Leave the build command empty.
+4. Set the publish directory to `.`.
+5. Deploy the `main` branch.
 
-```bash
-npm install
-npm run dev
-```
+After deployment, remove the older Home Screen installation once, open the new Render URL in Safari, verify version 7, then use **Share → Add to Home Screen**.
 
-Open the local URL printed by Vite.
+## Important offline note
 
-Production validation:
+Cytoscape.js is cached after the app has been opened online. Open the deployed app online at least once before relying on offline mode.
 
-```bash
-npm run check
-npm run build
-npm run preview
-```
+## Local data
 
-The production output is generated in `dist/`.
-
-# Deploying to Render
-
-This project should be deployed as a **Render Static Site**, not a Web Service. Graph editing, DOT parsing, export, PWA caching, and local persistence all run in the browser.
-
-A Render Web Service is only needed later for accounts, cloud synchronization, shared editable URLs, team permissions, databases, or real-time collaboration.
-
-## Option A — Manual Render configuration
-
-1. Create a GitHub repository.
-2. Upload every file and folder from this project to the repository root.
-3. Commit `package-lock.json` along with the source files.
-4. In Render, choose **New → Static Site**.
-5. Connect the GitHub repository.
-6. Configure:
-
-| Setting | Value |
-|---|---|
-| Branch | `main` |
-| Root directory | leave blank |
-| Build command | `npm ci && npm run build` |
-| Publish directory | `dist` |
-| Auto deploy | enabled |
-
-7. Create the Static Site.
-8. Wait for the build to complete.
-9. Open the supplied `onrender.com` URL in Safari.
-
-The included `.node-version` pins Node.js to `24.14.1` so local and Render builds use a consistent runtime.
-
-## Option B — Render Blueprint
-
-A complete `render.yaml` is included. In Render:
-
-1. Choose **New → Blueprint**.
-2. Connect the GitHub repository.
-3. Select the repository containing `render.yaml`.
-4. Review the proposed `dotcanvas-react` Static Site.
-5. Apply the Blueprint.
-
-The Blueprint configures:
-
-```yaml
-buildCommand: npm ci && npm run build
-staticPublishPath: ./dist
-```
-
-It also adds:
-
-- `Cache-Control: no-cache` for the generated service worker and manifest
-- basic security response headers
-- an SPA rewrite to `/index.html`
-
-## Updating the installed iPhone PWA
-
-After pushing a change to GitHub:
-
-1. Render automatically rebuilds and deploys the site.
-2. Reopen the installed app.
-3. The PWA update message appears when the new service worker is ready.
-4. Tap **Update**.
-
-For the first React/Vite deployment, remove the older vanilla DotCanvas icon from the Home Screen once, open the new Render URL in Safari, and add it to the Home Screen again. This prevents the previous hand-written service worker from controlling the new Vite build.
-
-## Install on iPhone
-
-1. Open the deployed Render URL in Safari.
-2. Tap **Share**.
-3. Choose **Add to Home Screen**.
-4. Tap **Add**.
-5. Launch DotCanvas from its Home Screen icon.
-
-## Data and privacy
-
-Documents are stored in browser local storage and graph files are processed on the device. A backend is not included. Export JSON backups regularly because removing the PWA or clearing Safari website data can delete locally stored documents.
-
-## When to introduce a backend
-
-Keep this Static Site while the product remains local-first. Add a separate Render Web Service when the following become requirements:
-
-- user accounts and authentication
-- document sync across devices
-- cloud file storage
-- public or private share links
-- comments and permissions
-- live collaborative editing
-- server-side version history
+Projects are stored in browser local storage. Image attachments can use substantial storage, so export JSON backups regularly. Clearing Safari website data or deleting the installed web app may remove local projects.
