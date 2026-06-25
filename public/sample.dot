@@ -1,0 +1,13 @@
+digraph Project {
+  graph [rankdir=LR, splines=curved];
+  node [shape=box, style=filled, fillcolor="#fffefa", color="#8b7cf6", fontcolor="#24262d"];
+  idea [label="Central idea"];
+  research [label="Research", color="#8b7cf6"];
+  design [label="Design", color="#e887b5"];
+  build [label="Build", color="#eea05c"];
+  launch [label="Launch", color="#5fc2ad"];
+  idea -> research;
+  idea -> design;
+  idea -> build;
+  idea -> launch;
+}
