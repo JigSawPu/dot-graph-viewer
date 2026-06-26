@@ -41,6 +41,7 @@
   --topbar-height: 64px;
   --panel-width: 360px;
   --ui-gap: 12px;
+  --dock-bottom: calc(var(--safe-bottom) + var(--ui-gap));
 }
 
 :root[data-theme='dark'] {
@@ -59,4 +60,8 @@
   --color-grid: rgba(95, 168, 224, 0.12);
   --shadow-panel: 0 22px 70px rgba(0, 0, 0, 0.4);
   --shadow-control: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+@media (display-mode: standalone) {
+  :root { --dock-bottom: max(6px, calc(var(--safe-bottom) - 18px)); }
 }

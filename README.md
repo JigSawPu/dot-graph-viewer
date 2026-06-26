@@ -180,3 +180,12 @@ Keep this Static Site while the product remains local-first. Add a separate Rend
 ## Render install-error fix
 
 This release pins Node.js 22.23.0/npm 10.9.4, replaces internal registry URLs in `package-lock.json` with public npm registry URLs, and sets `SKIP_INSTALL_DEPS=true` so Render does not run a second automatic dependency installation. See `ONRENDER_SETUP.md` for the exact dashboard settings and use **Clear build cache & deploy** after uploading this release.
+
+
+## UX fixes in this build
+
+- Choosing a structure now rearranges the current graph by default instead of replacing it.
+- The structure dialog only replaces the graph when the replacement switch is enabled.
+- Reflow preserves the current canvas pan and zoom unless a fresh template is created.
+- Cytoscape's gray active-touch indicator and selection box are disabled.
+- The PWA bottom dock uses a standalone-specific safe-area offset so it sits closer to the Home indicator while remaining correctly aligned in Safari.

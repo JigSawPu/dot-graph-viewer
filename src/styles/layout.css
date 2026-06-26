@@ -50,7 +50,7 @@
   position: absolute;
   z-index: 30;
   left: 50%;
-  bottom: calc(var(--safe-bottom) + var(--ui-gap));
+  bottom: var(--dock-bottom);
   transform: translateX(-50%);
   height: var(--dock-height);
   max-width: calc(100% - var(--safe-left) - var(--safe-right) - 24px);
@@ -68,7 +68,7 @@
   position: absolute;
   z-index: 40;
   right: calc(var(--safe-right) + var(--ui-gap));
-  bottom: calc(var(--safe-bottom) + var(--dock-height) + 24px);
+  bottom: calc(var(--dock-bottom) + var(--dock-height) + 17px);
   width: min(var(--panel-width), calc(100% - 24px));
   max-height: min(72vh, 720px);
   overflow: hidden;

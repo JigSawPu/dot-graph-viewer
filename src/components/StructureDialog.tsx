@@ -19,7 +19,7 @@ export function StructureDialog({ open, current, replaceGraph, onReplaceGraphCha
           <div><small>DIAGRAM LIBRARY</small><h2 id="structures-title">Choose a structure</h2></div>
           <button className="panel-close" type="button" onClick={onClose} aria-label="Close">×</button>
         </div>
-        <p className="panel-copy">Rearrange the current graph, or replace it with a starter template.</p>
+        <p className="panel-copy">Rearrange the current graph without replacing it. Enable the option below only when you want a fresh starter template.</p>
         <div className="structure-grid">
           {STRUCTURES.map(item => (
             <button key={item.id} className={`structure-option${current === item.id ? ' active' : ''}`} type="button" onClick={() => onApply(item.id)}>
@@ -28,7 +28,7 @@ export function StructureDialog({ open, current, replaceGraph, onReplaceGraphCha
             </button>
           ))}
         </div>
-        <label className="switch-row modal-switch"><span>Replace current graph with template</span><input type="checkbox" checked={replaceGraph} onChange={event => onReplaceGraphChange(event.target.checked)} /></label>
+        <label className="switch-row modal-switch"><span>Replace current graph with a fresh template</span><input type="checkbox" checked={replaceGraph} onChange={event => onReplaceGraphChange(event.target.checked)} /></label>
       </section>
     </div>
   );

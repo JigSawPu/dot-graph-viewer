@@ -52,8 +52,8 @@ export default function App() {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
   const [connectSourceId, setConnectSourceId] = useState<string | null>(null);
-  const [replaceGraph, setReplaceGraph] = useState(true);
-  const [pendingLayout, setPendingLayout] = useState<DiagramStructure | null>(null);
+  const [replaceGraph, setReplaceGraph] = useState(false);
+  const [pendingLayout, setPendingLayout] = useState<{ structure: DiagramStructure; fit: boolean } | null>(null);
   const [zoom, setZoom] = useState(1);
   const [toast, setToast] = useState('');
 
@@ -72,7 +72,7 @@ export default function App() {
   useEffect(() => {
     if (!pendingLayout) return;
     const frame = window.requestAnimationFrame(() => {
-      graphRef.current?.applyLayout(pendingLayout);
+      graphRef.current?.applyLayout(pendingLayout.structure, { fit: pendingLayout.fit });
       setPendingLayout(null);
     });
     return () => window.cancelAnimationFrame(frame);
@@ -202,14 +202,14 @@ export default function App() {
       commit(current => { current.structure = structure; return current; });
     }
     setPanel(null);
-    setPendingLayout(structure);
+    setPendingLayout({ structure, fit: replaceGraph || document.nodes.length === 0 });
   };
 
   const loadExample = () => {
     replace(createExampleDocument(theme));
     setPanel(null);
     setSelectedNodeId(null);
-    setPendingLayout('mindmap');
+    setPendingLayout({ structure: 'mindmap', fit: true });
   };
 
   const openFile = () => fileInputRef.current?.click();
@@ -226,7 +226,7 @@ export default function App() {
       setSelectedNodeId(null);
       setSelectedEdgeId(null);
       setPanel(null);
-      setPendingLayout(imported.structure ?? 'mindmap');
+      setPendingLayout({ structure: imported.structure ?? 'mindmap', fit: true });
       setToast(`${file.name} opened`);
     } catch (error) {
       console.error(error);
@@ -341,7 +341,7 @@ export default function App() {
           onOpen={openFile}
           onExample={loadExample}
           onStructures={() => setPanel('structures')}
-          onReflow={() => { setPanel(null); setPendingLayout(document.structure); }}
+          onReflow={() => { setPanel(null); setPendingLayout({ structure: document.structure, fit: false }); }}
           onExport={() => setPanel('export')}
           onToggleTheme={() => { setTheme(current => current === 'light' ? 'dark' : 'light'); setPanel(null); }}
           onFit={() => { graphRef.current?.fit(); setPanel(null); }}

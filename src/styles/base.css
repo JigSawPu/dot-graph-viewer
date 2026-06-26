@@ -15,3 +15,9 @@ button { border: 0; cursor: pointer; }
 button:disabled { opacity: 0.36; cursor: default; }
 textarea { resize: vertical; }
 ::selection { background: color-mix(in srgb, var(--color-accent) 28%, transparent); }
+
+.graph-canvas, .graph-canvas canvas {
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none;
+  user-select: none;
+}

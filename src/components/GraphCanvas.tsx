@@ -6,7 +6,7 @@ import type { DiagramStructure, EditorTool, GraphDocument, Point, PositionMap } 
 export interface GraphCanvasHandle {
   fit: () => void;
   zoomBy: (factor: number) => void;
-  applyLayout: (structure: DiagramStructure) => void;
+  applyLayout: (structure: DiagramStructure, options?: { fit?: boolean }) => void;
   exportImage: (type: 'png' | 'jpg', background: string) => string;
   getCenterPosition: () => Point;
 }
@@ -65,6 +65,15 @@ function elementsForDocument(document: GraphDocument): ElementDefinition[] {
 }
 
 const GRAPH_STYLE = [
+        {
+          selector: 'core',
+          style: {
+            'active-bg-opacity': 0,
+            'active-bg-size': 0,
+            'selection-box-opacity': 0,
+            'selection-box-border-width': 0
+          }
+        },
         {
           selector: 'node',
           style: {
@@ -178,7 +187,7 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
       minZoom: 0.18,
       maxZoom: 4.5,
       wheelSensitivity: 0.18,
-      boxSelectionEnabled: true,
+      boxSelectionEnabled: false,
       selectionType: 'single',
       style: GRAPH_STYLE,
       layout: { name: 'preset' }
@@ -259,10 +268,11 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
         renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 }
       });
     },
-    applyLayout: structure => {
+    applyLayout: (structure, options = {}) => {
       const cy = cyRef.current;
       if (!cy || !cy.nodes().length) return;
       const positions = positionsForStructure(documentRef.current, structure);
+      const shouldFit = options.fit ?? false;
       const commitPositions = () => {
         const result: PositionMap = {};
         cy.nodes().forEach(node => { result[node.id()] = { ...node.position() }; });
@@ -276,7 +286,7 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
           positions: nodeId => positions[nodeId] ?? cy.$id(nodeId).position(),
           animate: true,
           animationDuration: 450,
-          fit: true,
+          fit: shouldFit,
           padding: window.innerWidth < 760 ? 84 : 120
         }).run();
       } else {
@@ -285,7 +295,7 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
           name: 'cose',
           animate: true,
           animationDuration: 520,
-          fit: true,
+          fit: shouldFit,
           padding: window.innerWidth < 760 ? 84 : 120,
           idealEdgeLength: 170,
           nodeRepulsion: 700000,
