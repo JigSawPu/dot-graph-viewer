@@ -1,15 +1,28 @@
 services:
   - type: web
-    name: dotcanvas-studio
+    name: dotcanvas-react
     runtime: static
-    staticPublishPath: .
+    buildCommand: npm ci --registry=https://registry.npmjs.org --no-audit --no-fund && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: NODE_VERSION
+        value: 22.23.0
+      - key: SKIP_INSTALL_DEPS
+        value: "true"
     headers:
-      - path: /service-worker.js
+      - path: /sw.js
         name: Cache-Control
         value: no-cache
       - path: /manifest.webmanifest
-        name: Content-Type
-        value: application/manifest+json
-      - path: /index.html
         name: Cache-Control
         value: no-cache
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
