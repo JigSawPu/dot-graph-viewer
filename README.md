@@ -189,3 +189,8 @@ This release pins Node.js 22.23.0/npm 10.9.4, replaces internal registry URLs in
 - Reflow preserves the current canvas pan and zoom unless a fresh template is created.
 - Cytoscape's gray active-touch indicator and selection box are disabled.
 - The PWA bottom dock uses a standalone-specific safe-area offset so it sits closer to the Home indicator while remaining correctly aligned in Safari.
+
+
+## Structure layout correction
+
+Selecting a structure now calculates and commits new positions for every existing node directly into the React document state. Node content and connections remain intact, the current viewport is preserved, and the graph visibly changes to the selected layout. Template replacement remains optional.

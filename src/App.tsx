@@ -12,6 +12,7 @@ import { useVisualViewport } from './hooks/useVisualViewport';
 import { PALETTES } from './lib/constants';
 import { createEdge, createExampleDocument, createNode, uid } from './lib/document';
 import { documentToDot, parseDot } from './lib/dot';
+import { positionsForStructure } from './lib/layouts';
 import { createStructureTemplate } from './lib/templates';
 import type { DiagramStructure, EditorTool, GraphDocument, GraphNode, GraphSettings, PanelId, Point, PositionMap, ThemeMode } from './types';
 
@@ -194,15 +195,40 @@ export default function App() {
   };
 
   const applyStructure = (structure: DiagramStructure) => {
-    if (replaceGraph || document.nodes.length === 0) {
-      replace(createStructureTemplate(structure, theme));
+    const shouldReplace = replaceGraph || document.nodes.length === 0;
+
+    if (shouldReplace) {
+      const nextDocument = createStructureTemplate(structure, theme);
+      const positions = positionsForStructure(nextDocument, structure);
+      if (positions) {
+        nextDocument.nodes.forEach(node => {
+          const position = positions[node.id];
+          if (position) node.position = position;
+        });
+      }
+      replace(nextDocument);
       setSelectedNodeId(null);
       setSelectedEdgeId(null);
+      if (!positions) setPendingLayout({ structure, fit: true });
     } else {
-      commit(current => { current.structure = structure; return current; });
+      const positions = positionsForStructure(document, structure);
+      if (positions) {
+        commit(current => {
+          current.structure = structure;
+          current.nodes.forEach(node => {
+            const position = positions[node.id];
+            if (position) node.position = position;
+          });
+          return current;
+        });
+      } else {
+        commit(current => { current.structure = structure; return current; });
+        setPendingLayout({ structure, fit: false });
+      }
     }
+
     setPanel(null);
-    setPendingLayout({ structure, fit: replaceGraph || document.nodes.length === 0 });
+    setToast(`${structure.charAt(0).toUpperCase()}${structure.slice(1)} layout applied`);
   };
 
   const loadExample = () => {
